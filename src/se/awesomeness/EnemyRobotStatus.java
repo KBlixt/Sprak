@@ -3,7 +3,7 @@ package se.awesomeness;
 /** innehåller information kring motståndarna */
 public class EnemyRobotStatus{
     double positionX;
-    double PositionY;
+    double positionY;
     double velocity;
     double acceleration;
 
@@ -20,11 +20,11 @@ public class EnemyRobotStatus{
     }
 
     public double getPositionY() {
-        return PositionY;
+        return positionY;
     }
 
     public void setPositionY(double positionY) {
-        PositionY = positionY;
+        this.positionY = positionY;
     }
 
     public double getVelocity() {
