@@ -5,6 +5,7 @@ public class EnemyRobotStatus{
     double positionX;
     double positionY;
     double velocity;
+    double heading;
     double acceleration;
 
     public EnemyRobotStatus(){
@@ -29,6 +30,14 @@ public class EnemyRobotStatus{
 
     public double getVelocity() {
         return velocity;
+    }
+
+    public double getHeading() {
+        return heading;
+    }
+
+    public void setHeading(double heading) {
+        this.heading = heading;
     }
 
     public void setVelocity(double velocity) {
