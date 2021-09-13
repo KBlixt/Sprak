@@ -1,14 +1,14 @@
 package se.awesomeness;
 
 /** innehåller information kring motståndarna */
-public class EnemyRobotStatus{
+public class EnemyRobot {
     double positionX;
     double positionY;
     double velocity;
     double heading;
     double acceleration;
 
-    public EnemyRobotStatus(){
+    public EnemyRobot(){
 
     }
 
