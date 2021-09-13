@@ -2,7 +2,10 @@ package se.awesomeness;
 
 import robocode.Robot;
 import robocode.AdvancedRobot;
+import robocode.RobotStatus;
+
 public class Spark extends AdvancedRobot {
+    RobotStatus status;
 
     public void run(){
         back(100);
@@ -17,6 +20,7 @@ public class Spark extends AdvancedRobot {
 
     }
     public void calculateMove(){
+
         setAhead(1000);
         setTurnLeft(40);
     }
@@ -29,5 +33,10 @@ public class Spark extends AdvancedRobot {
         setFire(3);
         setTurnGunLeft(20);
         setAhead(50);
+    }
+
+    /** Uppdaterar statusen för roboten i början av varje runda */
+    public void onStatus(RobotStatus status){
+        this.status = status;
     }
 }
