@@ -25,18 +25,16 @@ public class Spark extends RateControlRobot {
     }
 
     public void calculateMove(){
-        Point robotPoint = new Point(status.getX(), status.getY());
         mover.updateStatus(status);
-        if (Algebra.getDistanceToPoint(robotPoint, targetPoint) < 10){
+
+        if (Algebra.getDistanceToPoint(new Point(status.getX(), status.getY()), targetPoint) < 5){
             targetPoint = MoveGenerator.getNewTargetPositionRandom(getBattleFieldWidth(),getBattleFieldHeight());
         }
 
+        double[] nextAction = mover.moveTowardsPoint(targetPoint);
 
-        double[] desiredHeading = mover.moveTowardsPoint(targetPoint);
-
-        System.out.println(desiredHeading[0]);
-        setTurnRate(desiredHeading[0]);
-        setVelocityRate(desiredHeading[1]);
+        setTurnRate(nextAction[0]);
+        setVelocityRate(nextAction[1]);
     }
 
     public void calculateRadar(){

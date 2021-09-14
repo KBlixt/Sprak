@@ -22,6 +22,36 @@ public class MoveGenerator {
 
         if (speed < 4 && Math.abs(desiredAngle) > 90) {
             reversing = true;
+        } else if(speed > -4 && Math.abs(desiredAngle) < 90){
+            reversing = false;
+        }
+
+        if (reversing){
+            desiredSpeed *= -1;
+
+            desiredAngle += 180;
+            if (desiredAngle >= 180) {
+                desiredAngle -= 360;
+            }
+        }
+
+        return new double[]{desiredAngle, desiredSpeed};
+
+    }
+
+    public double[] moveAwayFromPoint(Point targetPoint){
+        double desiredSpeed = 8;
+        double desiredAngle = getDesiredAngle(targetPoint);
+
+        desiredAngle += 180;
+        if (desiredAngle >= 180) {
+            desiredAngle -= 360;
+        }
+
+        if (speed < 4 && Math.abs(desiredAngle) > 90) {
+            reversing = true;
+        } else if(speed < 4 && Math.abs(desiredAngle) < 90){
+            reversing = false;
         }
 
         if (reversing){
@@ -34,11 +64,6 @@ public class MoveGenerator {
         }
 
         return new double[]{desiredAngle, desiredSpeed};
-
-    }
-
-    public double[] moveAwayFromPoint(Point targetPoint){
-        return moveTowardsPoint(targetPoint);
     }
 
     public static Point getNewTargetPositionRandom(double maxX, double maxY){
