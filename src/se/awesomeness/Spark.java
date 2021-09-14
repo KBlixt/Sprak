@@ -46,7 +46,6 @@ public class Spark extends AdvancedRobot {
     public void calculateFire(){
         setFire(3);
         setTurnGunLeft(20);
-        setAhead(50);
     }
 
     /** Uppdaterar statusen för roboten i början av varje runda */
