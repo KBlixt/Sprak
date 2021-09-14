@@ -2,7 +2,7 @@ package se.awesomeness;
 
 import robocode.*;
 
-public class Spark extends RateControlRobot {
+public class Spark extends AdvancedRobot {
     RobotStatus status;
     Point targetPoint;
     MoveGenerator mover;
@@ -33,8 +33,10 @@ public class Spark extends RateControlRobot {
 
         double[] nextAction = mover.moveTowardsPoint(targetPoint);
 
-        setTurnRate(nextAction[0]);
-        setVelocityRate(nextAction[1]);
+        setMaxTurnRate(nextAction[0]);
+        setTurnRight(nextAction[0]);
+        setMaxVelocity(nextAction[1]);
+        setAhead(100*nextAction[1]);
     }
 
     public void calculateRadar(){
