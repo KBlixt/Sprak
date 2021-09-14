@@ -25,7 +25,7 @@ public class MoveGenerator {
     public void updateStatus(RobotStatus status) {
         this.status = status;
         robotPoint = new Point(status.getX(), status.getY());
-        currentVelocity.angle = status.getHeading();
+        currentVelocity.direction = status.getHeading();
         currentVelocity.speed = status.getVelocity();
     }
 
@@ -68,7 +68,7 @@ public class MoveGenerator {
     }
 
     private double getDesiredAngleToTargetPoint() {
-        double desiredAngle = Algebra.getAngleToPoint(robotPoint, targetPoint) - currentVelocity.angle;
+        double desiredAngle = Algebra.getAngleToPoint(robotPoint, targetPoint) - currentVelocity.direction;
 
         if (desiredAngle < -180) {
             desiredAngle = desiredAngle + 360;

@@ -1,10 +1,10 @@
 package se.awesomeness;
 
 public class Velocity {
-    double angle;
+    double direction;
     double speed;
     public Velocity(double angle, double speed){
-        this.angle = angle;
+        this.direction = angle;
         this.speed = speed;
     }
 }

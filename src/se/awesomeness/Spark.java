@@ -30,8 +30,8 @@ public class Spark extends AdvancedRobot {
 
         Velocity targetVelocity = mover.getNextMovement(movePolicies);
 
-        setMaxTurnRate(targetVelocity.angle);
-        setTurnRight(targetVelocity.angle);
+        setMaxTurnRate(targetVelocity.direction);
+        setTurnRight(targetVelocity.direction);
         setMaxVelocity(targetVelocity.speed);
         setAhead(800*targetVelocity.speed);
     }
