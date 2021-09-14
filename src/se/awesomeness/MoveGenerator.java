@@ -1,92 +1,108 @@
 package se.awesomeness;
 
-import org.jetbrains.annotations.NotNull;
 import robocode.RobotStatus;
 
+import java.util.List;
 import java.util.Random;
 
 public class MoveGenerator {
     RobotStatus status;
     boolean reversing;
     Point robotPoint;
-    double currentHeading;
-    double speed;
+    Velocity currentVelocity;
+    Velocity targetVelocity;
+    double boardX;
+    double boardY;
+    Point targetPoint;
 
-    public MoveGenerator() {
+    public MoveGenerator(double boardWidth, double boardY) {
+        this.boardY = boardY;
+        this.boardX = boardWidth;
         reversing = false;
+        currentVelocity = new Velocity(0, 0);
     }
 
-    public double[] moveTowardsPoint(Point targetPoint){
-        double desiredSpeed = 8;
-        double desiredAngle = getDesiredAngle(targetPoint);
+    public void updateStatus(RobotStatus status) {
+        this.status = status;
+        robotPoint = new Point(status.getX(), status.getY());
+        currentVelocity.angle = status.getHeading();
+        currentVelocity.speed = status.getVelocity();
+    }
 
-        if (speed < 4 && Math.abs(desiredAngle) > 90) {
-            reversing = true;
-        } else if(speed > -4 && Math.abs(desiredAngle) < 90){
-            reversing = false;
+    public Velocity getNextMovement(List<MovePolicy> movePolicies) {
+        if (movePolicies.contains(MovePolicy.MOVE_FROM_CENTER)) {
+            targetPoint = new Point(boardX / 2, boardY / 2);
+            moveAwayFromTargetPoint(movePolicies.contains(MovePolicy.ALLOW_FAST_COURSE_CHANGE));
         }
 
-        if (reversing){
-            desiredSpeed *= -1;
-
-            desiredAngle += 180;
-            if (desiredAngle >= 180) {
-                desiredAngle -= 360;
+        if (movePolicies.contains(MovePolicy.MOVE_TO_RANDOM_POINTS)) {
+            if (targetPoint == null) {
+                targetPoint = getRandomPoint(boardX, boardY);
             }
+            if (Algebra.getDistanceToPoint(robotPoint, targetPoint) < 40) {
+                targetPoint = getRandomPoint(boardX, boardY);
+            }
+            moveTowardsTargetPoint(movePolicies.contains(MovePolicy.ALLOW_FAST_COURSE_CHANGE));
         }
 
-        return new double[]{desiredAngle, desiredSpeed};
-
+        return targetVelocity;
     }
 
-    public double[] moveAwayFromPoint(Point targetPoint){
+    private void moveTowardsTargetPoint(boolean allowFastCoarseChange) {
         double desiredSpeed = 8;
-        double desiredAngle = getDesiredAngle(targetPoint);
+        double desiredAngle = getDesiredAngleToTargetPoint();
+
+        targetVelocity = findBestVelocity(desiredAngle, desiredSpeed, allowFastCoarseChange);
+    }
+
+    private void moveAwayFromTargetPoint(boolean allowFastCoarseChange) {
+        double desiredSpeed = 8;
+        double desiredAngle = getDesiredAngleToTargetPoint();
 
         desiredAngle += 180;
         if (desiredAngle >= 180) {
             desiredAngle -= 360;
         }
 
-        if (speed < 4 && Math.abs(desiredAngle) > 90) {
-            reversing = true;
-        } else if(speed < 4 && Math.abs(desiredAngle) < 90){
-            reversing = false;
-        }
-
-        if (reversing){
-            desiredAngle += 180;
-            if (desiredAngle >= 180) {
-                desiredAngle -= 360;
-            }
-
-            desiredSpeed *= -1;
-        }
-
-        return new double[]{desiredAngle, desiredSpeed};
+        targetVelocity = findBestVelocity(desiredAngle, desiredSpeed, allowFastCoarseChange);
     }
 
-    public static Point getNewTargetPositionRandom(double maxX, double maxY){
-        Random ran = new Random();
-        return new Point((maxX - 80) * ran.nextDouble() + 40,(maxY - 80) * ran.nextDouble() + 40);
-    }
+    private double getDesiredAngleToTargetPoint() {
+        double desiredAngle = Algebra.getAngleToPoint(robotPoint, targetPoint) - currentVelocity.angle;
 
-    private double getDesiredAngle(Point targetPoint){
-        double desiredAngle = Algebra.getAngleToPoint(robotPoint, targetPoint)-currentHeading;
-
-        if (desiredAngle < -180){
+        if (desiredAngle < -180) {
             desiredAngle = desiredAngle + 360;
-        }else if (desiredAngle > 180){
+        } else if (desiredAngle > 180) {
             desiredAngle = desiredAngle - 360;
         }
         return desiredAngle;
     }
 
-    public void updateStatus(RobotStatus status){
-        this.status = status;
-        robotPoint = new Point(status.getX(), status.getY());
-        currentHeading = status.getHeading();
-        speed = status.getVelocity();
+    private Velocity findBestVelocity(double desiredAngle, double desiredSpeed, boolean allowFastCoarseChange) {
+        double limit = 4;
+        if (allowFastCoarseChange) {
+            limit = 0;
+        }
+
+        if (currentVelocity.speed < limit && Math.abs(desiredAngle) > 90) {
+            reversing = true;
+        } else if (currentVelocity.speed > -limit && Math.abs(desiredAngle) < 90) {
+            reversing = false;
+        }
+
+        if (reversing) {
+            desiredAngle += 180;
+            if (desiredAngle >= 180) {
+                desiredAngle -= 360;
+            }
+            desiredSpeed *= -1;
+        }
+
+        return new Velocity(desiredAngle, desiredSpeed);
     }
 
+    public static Point getRandomPoint(double maxX, double maxY) {
+        Random ran = new Random();
+        return new Point((maxX - 80) * ran.nextDouble() + 40, (maxY - 80) * ran.nextDouble() + 40);
+    }
 }

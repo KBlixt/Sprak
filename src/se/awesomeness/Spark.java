@@ -2,21 +2,22 @@ package se.awesomeness;
 
 import robocode.*;
 
+import java.util.List;
+
 public class Spark extends AdvancedRobot {
     RobotStatus status;
-    Point targetPoint;
-    MoveGenerator mover;
+
+    List<MovePolicy> movePolicies = List.of(
+            MovePolicy.MOVE_TO_RANDOM_POINTS,
+            MovePolicy.ALLOW_FAST_COURSE_CHANGE);
 
     public void run(){
-        mover = new MoveGenerator();
-        targetPoint = new Point(
-                getBattleFieldWidth() / 2,
-                getBattleFieldHeight() / 2);
+        MoveGenerator mover = new MoveGenerator(getBattleFieldWidth(), getBattleFieldHeight());
 
         //noinspection InfiniteLoopStatement
         while (true){
 
-            calculateMove();
+            calculateMove(mover);
             calculateRadar();
             calculateFire();
             execute();
@@ -24,19 +25,15 @@ public class Spark extends AdvancedRobot {
 
     }
 
-    public void calculateMove(){
+    public void calculateMove(MoveGenerator mover){
         mover.updateStatus(status);
 
-        if (Algebra.getDistanceToPoint(new Point(status.getX(), status.getY()), targetPoint) < 5){
-            targetPoint = MoveGenerator.getNewTargetPositionRandom(getBattleFieldWidth(),getBattleFieldHeight());
-        }
+        Velocity targetVelocity = mover.getNextMovement(movePolicies);
 
-        double[] nextAction = mover.moveTowardsPoint(targetPoint);
-
-        setMaxTurnRate(nextAction[0]);
-        setTurnRight(nextAction[0]);
-        setMaxVelocity(nextAction[1]);
-        setAhead(100*nextAction[1]);
+        setMaxTurnRate(targetVelocity.angle);
+        setTurnRight(targetVelocity.angle);
+        setMaxVelocity(targetVelocity.speed);
+        setAhead(800*targetVelocity.speed);
     }
 
     public void calculateRadar(){
@@ -52,5 +49,6 @@ public class Spark extends AdvancedRobot {
     public void onStatus(StatusEvent e) {
         this.status = e.getStatus();
     }
+
 
 }
