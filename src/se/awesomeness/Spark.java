@@ -1,14 +1,18 @@
 package se.awesomeness;
 
-import robocode.Robot;
-import robocode.AdvancedRobot;
-import robocode.RobotStatus;
+import robocode.*;
 
-public class Spark extends AdvancedRobot {
+public class Spark extends RateControlRobot {
     RobotStatus status;
+    Point targetPoint;
+    MoveGenerator mover;
 
     public void run(){
-        back(100);
+        mover = new MoveGenerator();
+        targetPoint = new Point(
+                getBattleFieldWidth() / 2,
+                getBattleFieldHeight() / 2);
+
         //noinspection InfiniteLoopStatement
         while (true){
 
@@ -19,10 +23,20 @@ public class Spark extends AdvancedRobot {
         }
 
     }
-    public void calculateMove(){
 
-        setAhead(1000);
-        setTurnLeft(40);
+    public void calculateMove(){
+        Point robotPoint = new Point(status.getX(), status.getY());
+        mover.updateStatus(status);
+        if (Algebra.getDistanceToPoint(robotPoint, targetPoint) < 10){
+            targetPoint = MoveGenerator.getNewTargetPositionRandom(getBattleFieldWidth(),getBattleFieldHeight());
+        }
+
+
+        double[] desiredHeading = mover.moveTowardsPoint(targetPoint);
+
+        System.out.println(desiredHeading[0]);
+        setTurnRate(desiredHeading[0]);
+        setVelocityRate(desiredHeading[1]);
     }
 
     public void calculateRadar(){
@@ -36,7 +50,8 @@ public class Spark extends AdvancedRobot {
     }
 
     /** Uppdaterar statusen för roboten i början av varje runda */
-    public void onStatus(RobotStatus status){
-        this.status = status;
+    public void onStatus(StatusEvent e) {
+        this.status = e.getStatus();
     }
+
 }
