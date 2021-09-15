@@ -2,7 +2,6 @@ package se.awesomeness;
 
 import robocode.ScannedRobotEvent;
 
-/** innehåller information kring motståndarna */
 public class EnemyRobot {
     Point position;
     Velocity velocity;
@@ -17,9 +16,9 @@ public class EnemyRobot {
     public EnemyRobot(String name){
         this.name = name;
     }
+    public void updateData(ScannedRobotEvent scannedRobot){
 
-
-    /** metoderna under här är för avancerad rörelse*/
+    }
     public Point getEstimatedPosition(long turn){
         double[] velVector = Velocity.getVelocityVector(velocity);
         double[] accVector = Acceleration.getAccelerationVector(acceleration);
