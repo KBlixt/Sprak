@@ -28,8 +28,11 @@ public class Spark extends Robot {
         while (true) {
             calulateRadar();
 
+
         }
     }
+
+
 
     public void calulateRadar() {
 
@@ -47,11 +50,21 @@ public class Spark extends Robot {
     public void onScannedRobot(ScannedRobotEvent event) {
 
 
+
         // Turns the gun towards our opponent.
         turnGunRight(getHeading() - getGunHeading() + event.getBearing());
-        fire(3);
-
-
+        // Distance to opponent > 350 pixels, fire: 1
+        if(event.getDistance() > 350) {
+            fire(1);
+        }
+        // Distance < 200 fire: 3
+        else if (event.getDistance() < 200) {
+            fire(3);
+        }
+        // 200 < Distance < 350 fire: 2
+        else if (event.getDistance() < 350 && event.getDistance() > 200) {
+                fire(2);
+            }
+        }
     }
-}
 
