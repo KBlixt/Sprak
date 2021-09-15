@@ -17,7 +17,14 @@ public class Spark extends Robot {
                 status.getHeading(),
                 getBattleFieldWidth(),
                 getBattleFieldHeight()));
+        ahead(Tools.distanceToClosestWall(
+                status.getX(),
+                status.getY(),
+                getBattleFieldWidth(),
+                getBattleFieldHeight())
+        -50);
 
+        //noinspection InfiniteLoopStatement
         while (true) {
             calulateRadar();
 

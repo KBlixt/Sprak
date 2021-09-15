@@ -4,25 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Tools {
-
-    public static double angleToWall(double fromX, double fromY, double heading, double wallWidth, double wallHeight){
+    /**returns an angle to the closest wall, need some information about the robot and walls.*/
+    public static double angleToWall(double robotX, double robotY, double robotHeading, double wallWidth, double wallHeight){
         ArrayList<double[]> wallPoints = new ArrayList<>();
-        wallPoints.add(new double[]{fromX, 0}); // nordliga väggen
-        wallPoints.add(new double[]{fromX, wallHeight}); // sydliga väggen
-        wallPoints.add(new double[]{0, fromY}); // västra väggen
-        wallPoints.add(new double[]{wallWidth, fromY}); // östra väggen
+        wallPoints.add(new double[]{robotX, 0}); // nordliga väggen
+        wallPoints.add(new double[]{robotX, wallHeight}); // sydliga väggen
+        wallPoints.add(new double[]{0, robotY}); // västra väggen
+        wallPoints.add(new double[]{wallWidth, robotY}); // östra väggen
 
         double angleToWall = 1;
 
 
-        switch (closestPoint(fromX, fromY, wallPoints)){
+        switch (closestPoint(robotX, robotY, wallPoints)){
             case 0 -> angleToWall = 180;
             case 1 -> angleToWall = 0;
             case 2 -> angleToWall = -90;
             case 3 -> angleToWall = 90;
 
         }
-        angleToWall = angleToWall - heading;
+        angleToWall = angleToWall - robotHeading;
         if (angleToWall > 180){
             angleToWall = angleToWall - 360;
         } else if (angleToWall < -180){
@@ -32,7 +32,20 @@ public class Tools {
 
     }
 
+    public static double distanceToClosestWall(double robotX, double robotY, double wallWidth, double wallHeight){
+        ArrayList<double[]> wallPoints = new ArrayList<>();
+        wallPoints.add(new double[]{robotX, 0}); // nordliga väggen
+        wallPoints.add(new double[]{robotX, wallHeight}); // sydliga väggen
+        wallPoints.add(new double[]{0, robotY}); // västra väggen
+        wallPoints.add(new double[]{wallWidth, robotY}); // östra väggen
 
+        double[] closestPoint = wallPoints.get(closestPoint(robotX, robotY, wallPoints));
+
+        return distanceToPoint(robotX,robotY,closestPoint[0], closestPoint[1]);
+    }
+    public static double distanceToPoint(double fromX, double fromY, double toX, double toY){
+        return Math.sqrt(Math.pow(toX - fromX,2) + Math.pow(toY - fromY,2));
+    }
 
     /** returnerar den närmsta punkten mellan en given punkt och några kandidater.
       * @param fromX den givna punktens X värde.
