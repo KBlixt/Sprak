@@ -6,11 +6,7 @@ import java.util.List;
 public class Tools {
     /**returns an angle to the closest wall, need some information about the robot and walls.*/
     public static double angleToWall(double robotX, double robotY, double robotHeading, double wallWidth, double wallHeight){
-        ArrayList<double[]> wallPoints = new ArrayList<>();
-        wallPoints.add(new double[]{robotX, 0}); // nordliga väggen
-        wallPoints.add(new double[]{robotX, wallHeight}); // sydliga väggen
-        wallPoints.add(new double[]{0, robotY}); // västra väggen
-        wallPoints.add(new double[]{wallWidth, robotY}); // östra väggen
+        ArrayList<double[]> wallPoints = generateWallPoints(robotX, robotY, wallWidth, wallHeight);
 
         double angleToWall = 1;
 
@@ -33,16 +29,13 @@ public class Tools {
     }
 
     public static double distanceToClosestWall(double robotX, double robotY, double wallWidth, double wallHeight){
-        ArrayList<double[]> wallPoints = new ArrayList<>();
-        wallPoints.add(new double[]{robotX, 0}); // nordliga väggen
-        wallPoints.add(new double[]{robotX, wallHeight}); // sydliga väggen
-        wallPoints.add(new double[]{0, robotY}); // västra väggen
-        wallPoints.add(new double[]{wallWidth, robotY}); // östra väggen
+        ArrayList<double[]> wallPoints = generateWallPoints(robotX, robotY, wallWidth, wallHeight);
 
         double[] closestPoint = wallPoints.get(closestPoint(robotX, robotY, wallPoints));
 
         return distanceToPoint(robotX,robotY,closestPoint[0], closestPoint[1]);
     }
+
     public static double distanceToPoint(double fromX, double fromY, double toX, double toY){
         return Math.sqrt(Math.pow(toX - fromX,2) + Math.pow(toY - fromY,2));
     }
@@ -74,4 +67,14 @@ public class Tools {
         }
         return closestPointIndex;
     }
+
+    private static ArrayList<double[]> generateWallPoints(double robotX, double robotY, double wallWidth, double wallHeight) {
+        ArrayList<double[]> wallPoints = new ArrayList<>();
+        wallPoints.add(new double[]{robotX, 0}); // nordliga väggen
+        wallPoints.add(new double[]{robotX, wallHeight}); // sydliga väggen
+        wallPoints.add(new double[]{0, robotY}); // västra väggen
+        wallPoints.add(new double[]{wallWidth, robotY}); // östra väggen
+        return wallPoints;
+    }
+
 }
