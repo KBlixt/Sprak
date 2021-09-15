@@ -17,13 +17,21 @@ public class Spark extends Robot {
 
     public void calulateRadar() {
 
-            // Turns the radar 180 degrees to the right.
-            turnRadarRight(180);
+        // Turns the radar 180 degrees to the right.
+        turnRadarRight(180);
 
     }
 
+    @Override
+    public void onScannedRobot(ScannedRobotEvent event) {
+
+
+        // Turns the gun towards our opponent.
+        turnGunRight(getHeading() - getGunHeading() + event.getBearing());
+        fire(3);
 
 
     }
+}
 
 
