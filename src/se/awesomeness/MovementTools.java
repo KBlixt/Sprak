@@ -3,7 +3,7 @@ package se.awesomeness;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Tools {
+public class MovementTools {
     /**returns an angle to the closest wall, need some information about the robot and walls.*/
     public static double angleToWall(double robotX, double robotY, double robotHeading, double wallWidth, double wallHeight){
         ArrayList<double[]> wallPoints = generateWallPoints(robotX, robotY, wallWidth, wallHeight);

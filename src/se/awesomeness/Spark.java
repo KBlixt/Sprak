@@ -11,18 +11,20 @@ public class Spark extends Robot {
     RobotStatus status;
 
     public void run(){
-        turnRight(Tools.angleToWall(
-                status.getX(),
-                status.getY(),
-                status.getHeading(),
-                getBattleFieldWidth(),
-                getBattleFieldHeight()));
-        ahead(Tools.distanceToClosestWall(
-                status.getX(),
-                status.getY(),
-                getBattleFieldWidth(),
-                getBattleFieldHeight())
-        -50);
+        turnRight(
+                MovementTools.angleToWall(
+                        status.getX(),
+                        status.getY(),
+                        status.getHeading(),
+                        getBattleFieldWidth(),
+                        getBattleFieldHeight()));
+        ahead(-50 +
+                MovementTools.distanceToClosestWall(
+                        status.getX(),
+                        status.getY(),
+                        getBattleFieldWidth(),
+                        getBattleFieldHeight())
+        );
         turnRight(180);
 
         //noinspection InfiniteLoopStatement
