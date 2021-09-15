@@ -10,7 +10,7 @@ public class Spark extends Robot {
 
     RobotStatus status;
 
-    public void run(){
+    public void run() {
         turnRight(
                 MovementTools.angleToWall(
                         status.getX(),
@@ -29,15 +29,14 @@ public class Spark extends Robot {
 
         //noinspection InfiniteLoopStatement
         while (true) {
-            calulateRadar();
+            calculateRadar();
 
 
         }
     }
 
 
-
-    public void calulateRadar() {
+    public void calculateRadar() {
 
         // Turns the radar 180 degrees to the right.
         turnRadarRight(180);
@@ -52,12 +51,10 @@ public class Spark extends Robot {
     @Override
     public void onScannedRobot(ScannedRobotEvent event) {
 
-
-
         // Turns the gun towards our opponent.
         turnGunRight(getHeading() - getGunHeading() + event.getBearing());
         // Distance to opponent > 350 pixels, fire: 1
-        if(event.getDistance() > 350) {
+        if (event.getDistance() > 350) {
             fire(1);
         }
         // Distance < 200 fire: 3
@@ -66,8 +63,12 @@ public class Spark extends Robot {
         }
         // 200 < Distance < 350 fire: 2
         else if (event.getDistance() < 350 && event.getDistance() > 200) {
-                fire(2);
-            }
+            fire(2);
         }
+        // Locks in on target, unless something closer gets inside the scanner sight.
+        scan();
+        resume();
     }
+}
+
 
