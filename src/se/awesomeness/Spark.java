@@ -23,6 +23,7 @@ public class Spark extends Robot {
                 getBattleFieldWidth(),
                 getBattleFieldHeight())
         -50);
+        turnRight(180);
 
         //noinspection InfiniteLoopStatement
         while (true) {
