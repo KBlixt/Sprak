@@ -33,6 +33,7 @@ public class Spark extends Robot {
         //noinspection InfiniteLoopStatement
         while (true) {
             System.out.println(closetBotName);
+            distanceToClosestBot=100_000_000;
             calculateRadar();
         }
     }
