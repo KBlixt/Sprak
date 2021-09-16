@@ -50,7 +50,7 @@ public class Mover {
 
 
         spark.turnRight(getAngleToPoint(target[0], target[1]));
-        spark.ahead(shortestDistance - stopEarlyOffset);
+        spark.ahead(shortestDistance - stopEarlyOffset -1);
     }
 
     /**returns an angle to the closest wall, need some information about the robot and walls.*/
