@@ -9,22 +9,11 @@ import robocode.ScannedRobotEvent;
 public class Spark extends Robot {
 
     RobotStatus status;
-
+    Mover mover;
     public void run() {
-        turnRight(
-                MovementTools.angleToWall(
-                        status.getX(),
-                        status.getY(),
-                        status.getHeading(),
-                        getBattleFieldWidth(),
-                        getBattleFieldHeight()));
-        ahead(-50 +
-                MovementTools.distanceToClosestWall(
-                        status.getX(),
-                        status.getY(),
-                        getBattleFieldWidth(),
-                        getBattleFieldHeight())
-        );
+        mover = new Mover(this);
+
+        mover.moveToClosestWall();
         turnRight(180);
 
         //noinspection InfiniteLoopStatement
@@ -47,9 +36,7 @@ public class Spark extends Robot {
         // Definiera en metod som kan anropas och löser problemet.
         // Distance to opponent > 350 pixels, fire: 1
 
-        fire(Math.ceil(300 / distanceToEnemy));
     }
-
 
     @Override
     public void onStatus(StatusEvent e) {
@@ -58,6 +45,7 @@ public class Spark extends Robot {
 
     @Override
     public void onScannedRobot(ScannedRobotEvent event) {
+        mover.updateEnemyPosition(event);
 
 
         // Turns the gun towards our opponent.
