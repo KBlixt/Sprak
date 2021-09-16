@@ -29,19 +29,27 @@ public class Spark extends Robot {
 
         //noinspection InfiniteLoopStatement
         while (true) {
-            calculateRadar();
-
-
+            calulateRadar();
         }
     }
 
 
-    public void calculateRadar() {
+    public void calulateRadar() {
 
         // Turns the radar 180 degrees to the right.
         turnRadarRight(180);
 
     }
+
+    public void calculateFire(double distanceToEnemy) {
+        // Vår robot ska skjuta på den opponent som är närmst.
+        // Vår robot ska skjuta olika stora kulor beroende på avståndet till opponent.
+        // Definiera en metod som kan anropas och löser problemet.
+        // Distance to opponent > 350 pixels, fire: 1
+
+        fire(Math.ceil(300 / distanceToEnemy));
+    }
+
 
     @Override
     public void onStatus(StatusEvent e) {
@@ -51,24 +59,13 @@ public class Spark extends Robot {
     @Override
     public void onScannedRobot(ScannedRobotEvent event) {
 
+
         // Turns the gun towards our opponent.
         turnGunRight(getHeading() - getGunHeading() + event.getBearing());
-        // Distance to opponent > 350 pixels, fire: 1
-        if (event.getDistance() > 350) {
-            fire(1);
-        }
-        // Distance < 200 fire: 3
-        else if (event.getDistance() < 200) {
-            fire(3);
-        }
-        // 200 < Distance < 350 fire: 2
-        else if (event.getDistance() < 350 && event.getDistance() > 200) {
-            fire(2);
-        }
+        calculateFire(event.getDistance());
         // Locks in on target, unless something closer gets inside the scanner sight.
         scan();
         resume();
     }
 }
-
 
