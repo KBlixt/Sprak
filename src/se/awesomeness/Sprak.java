@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Spark extends RateControlRobot {
+public class Sprak extends RateControlRobot {
 
     Point position = new Point();
     Vector2D velocityVector = new Vector2D();
