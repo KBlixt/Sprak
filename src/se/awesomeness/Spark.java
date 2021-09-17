@@ -26,7 +26,8 @@ public class Spark extends Robot {
         while (true) {
             distanceToClosestBot=100_000_000;
             calculateRadar();
-            System.out.println(closetBotName);
+            System.out.println("Robot: [" + closetBotName + "]" + " Distance: [" + distanceToClosestBot + "]");
+            System.out.println();
 
             if (distanceToClosestBot > 350){
                 mover.moveToClosestRobot(100);
