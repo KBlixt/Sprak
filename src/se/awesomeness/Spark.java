@@ -2,24 +2,27 @@ package se.awesomeness;
 
 import robocode.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Spark extends RateControlRobot {
 
-    Point position = new Point(0,0);
-    Vector2D velocityVector = new Vector2D(0,0);
+    Point position = new Point();
+    Vector2D velocityVector = new Vector2D();
 
     Map<String, EnemyRobot> enemyRobots;
     List<String> deadRobots = new ArrayList<>();
 
     public void run(){
+        enemyRobots = new HashMap<>();
         ThreatBasedMovement mover = new ThreatBasedMovement(this);
+        setRadarRotationRate(45);
 
         //noinspection InfiniteLoopStatement
         while (true){
             mover.UpdateThreats(getTime());
-            //do stuff
+            mover.moveAway();
             execute();
         }
 
