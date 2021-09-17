@@ -147,11 +147,11 @@ public class Mover {
         return angleToPoint;
     }
     private double shortestAngle(double fromAngle, double toAngle){
-        double angleDelta = toAngle - fromAngle;
+        double angleDelta = (toAngle - fromAngle) %360;
         if (angleDelta < -180){
-            return -angleDelta + 360;
+            return angleDelta + 360;
         }else if ( angleDelta > 180){
-            return  -angleDelta -360;
+            return angleDelta - 360 ;
         }else{
             return angleDelta;
         }
