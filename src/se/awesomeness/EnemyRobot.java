@@ -16,6 +16,7 @@ public class EnemyRobot {
     double threatPointSpeed;
 
     public EnemyRobot(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading){
+        name = scannedRobot.getName();
         velocity = new Vector2D(scannedRobot.getVelocity(), scannedRobot.getHeading());
         threatPointDistance = 0;
         threatPointSpeed = 0;
@@ -73,5 +74,9 @@ public class EnemyRobot {
 
     public void setThreatPointSpeed(double threatPointSpeed) {
         this.threatPointSpeed = threatPointSpeed;
+    }
+
+    public String getName() {
+        return name;
     }
 }
