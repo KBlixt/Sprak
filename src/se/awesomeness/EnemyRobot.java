@@ -12,11 +12,13 @@ public class EnemyRobot {
     Vector2D velocity;
     Vector2D acceleration;
 
-    ThreatInfo threatInfo;
+    double threatPointDistance;
+    double threatPointSpeed;
 
     public EnemyRobot(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading){
         velocity = new Vector2D(scannedRobot.getVelocity(), scannedRobot.getHeading());
-        threatInfo = new ThreatInfo();
+        threatPointDistance = 0;
+        threatPointSpeed = 0;
         updateData(scannedRobot, sparkPosition, sparkHeading);
     }
 
@@ -56,11 +58,20 @@ public class EnemyRobot {
         estimatedVelocity.setVector(Math.max(8,estimatedVelocity.getMagnitude()), estimatedVelocity.getDirection());
         return estimatedVelocity;
     }
-
-
-    public ThreatInfo getThreatInfo(){
-        return threatInfo;
+    
+    public double getThreatPointDistance() {
+        return threatPointDistance;
     }
 
+    public void setThreatPointDistance(double threatPointDistance) {
+        this.threatPointDistance = threatPointDistance;
+    }
 
+    public double getThreatPointSpeed() {
+        return threatPointSpeed;
+    }
+
+    public void setThreatPointSpeed(double threatPointSpeed) {
+        this.threatPointSpeed = threatPointSpeed;
+    }
 }
