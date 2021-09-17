@@ -12,18 +12,18 @@ public class Mover {
     Map<String, double[]> enemyPositions;
     Spark spark;
 
+
+    /** Creates a mover object that can move Spark.
+     * @param spark the Spark to move.
+     */
     public Mover(Spark spark){
         enemyPositions = new HashMap<>();
         this.spark = spark;
     }
-    public void updateEnemyPosition(ScannedRobotEvent robot){
-        double X =  spark.getX() + robot.getDistance() * Math.sin(Math.toRadians(spark.getHeading() + robot.getBearing()));
-        double Y =  spark.getY() + robot.getDistance() * Math.cos(Math.toRadians(spark.getHeading() + robot.getBearing()));
-        enemyPositions.put(robot.getName(), new double[]{X, Y});
-    }
 
-    public void doNotMove(){}
-
+    /** Moves Spark to the known robot, stops <stopEarlyOffset> pixels early.
+     * @param stopEarlyOffset pixels to stop early.
+     */
     public void moveToClosestRobot(double stopEarlyOffset){
         String closestRobotName = "";
         double shortestDistance = 0;
@@ -46,12 +46,44 @@ public class Mover {
         }
         double[] target = enemyPositions.get(closestRobotName);
 
-        spark.turnRight(shortestAngle(spark.getHeading(), getAngleToPoint(target[0], target[1])));
+        double turnAngle = shortestAngle(spark.getHeading(), getAngleToPoint(target[0], target[1]));
+
+        spark.turnRight(turnAngle);
         spark.ahead(shortestDistance - stopEarlyOffset);
     }
 
-    /**returns an angle to the closest wall, need some information about the robot and walls.*/
-    public void turnTowardsClosestWall(){
+    /** Moves Spark to the closest Wall, stops <stopEarlyOffset> pixels early.
+     * @param stopEarlyOffset pixels to stop early.
+     */
+    public void moveToClosestWall(double stopEarlyOffset){
+
+        ArrayList<double[]> wallPoints = generateWallPoints();
+        double[] closestPoint = wallPoints.get(closestPoint(wallPoints));
+
+        spark.turnRight(angleToClosestWall());
+        spark.ahead(distanceToPoint(closestPoint[0], closestPoint[1]) - stopEarlyOffset);
+    }
+
+    /** Moves Spark nothing.
+     *
+     */
+    public void doNotMove(){}
+
+    /** updates enemyPosition for the enemy scanned.
+     * @param robot ScannedRobotEvent information to update with.
+     */
+    public void updateEnemyPosition(ScannedRobotEvent robot){
+
+        double angle = Math.toRadians(spark.getHeading() + robot.getBearing());
+
+        double X =  spark.getX() + robot.getDistance() * Math.sin(angle);
+        double Y =  spark.getY() + robot.getDistance() * Math.cos(angle);
+
+        enemyPositions.put(robot.getName(), new double[]{X, Y});
+    }
+
+
+    private double angleToClosestWall(){
         ArrayList<double[]> wallPoints = generateWallPoints();
         double angleToWall = 1;
         switch (closestPoint(wallPoints)){
@@ -66,23 +98,11 @@ public class Mover {
         } else if (angleToWall < -180){
             angleToWall = angleToWall + 360;
         }
-        spark.turnRight(angleToWall);
+        return angleToWall;
     }
-
-    public void moveToClosestWall(){
-        turnTowardsClosestWall();
-
-        ArrayList<double[]> wallPoints = generateWallPoints();
-
-        double[] closestPoint = wallPoints.get(closestPoint(wallPoints));
-
-        spark.ahead(distanceToPoint(closestPoint[0], closestPoint[1]) - 50);
-    }
-
     private double distanceToPoint(double toX, double toY){
         return Math.sqrt(Math.pow(toX - spark.status.getX(),2) + Math.pow(toY - spark.status.getY(),2));
     }
-
     private int closestPoint(List<double[]> points){
         int closestPointIndex = 0;
 
@@ -104,28 +124,28 @@ public class Mover {
         }
         return closestPointIndex;
     }
-
     private ArrayList<double[]> generateWallPoints() {
         ArrayList<double[]> wallPoints = new ArrayList<>();
+
         wallPoints.add(new double[]{spark.status.getX(), 0}); // nordliga väggen
         wallPoints.add(new double[]{spark.status.getX(), spark.getBattleFieldHeight()}); // sydliga väggen
         wallPoints.add(new double[]{0, spark.status.getY()}); // västra väggen
         wallPoints.add(new double[]{spark.getBattleFieldWidth(), spark.status.getY()}); // östra väggen
+
         return wallPoints;
     }
-
-    private double getAngleToPoint(double toX, double toY){
+    private double getAngleToPoint(double toX, double toY) {
         double angleToPoint = Math.atan2(
                 toY - spark.getY(),
-                toX - spark.getX());
+                toX - spark.getX()
+        );
 
         angleToPoint = Math.toDegrees(-angleToPoint) + 90;
-        if (angleToPoint > 180){
+        if (angleToPoint > 180) {
             angleToPoint = angleToPoint - 360;
         }
         return angleToPoint;
     }
-
     private double shortestAngle(double fromAngle, double toAngle){
         double angleDelta = toAngle - fromAngle;
         if (angleDelta < -180){

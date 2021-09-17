@@ -17,7 +17,7 @@ public class Spark extends Robot {
     public void run() {
         mover = new Mover(this);
 
-        mover.moveToClosestWall();
+        mover.moveToClosestWall(50);
         turnRight(180);
 
         //noinspection InfiniteLoopStatement
