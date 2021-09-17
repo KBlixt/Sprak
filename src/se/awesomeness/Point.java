@@ -16,6 +16,11 @@ public class Point {
         setPoint(point);
     }
 
+    public Point(){
+        x = 0;
+        y = 0;
+    }
+
 
     public void setPoint(double x, double y){
         this.x = x;
@@ -75,4 +80,7 @@ public class Point {
         return Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
     }
 
+    public String toString(){
+        return "[point]: (X: " + getX() + " , Y: " + getY() + ")";
+    }
 }
