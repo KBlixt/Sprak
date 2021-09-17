@@ -14,9 +14,6 @@ public class Spark extends Robot {
     RobotStatus status;
 
     // Variables to track distance & name of enemy robots.
-    double distanceToClosestBot = 100_000_000;
-    String closetBotName = "";
-
 
 
     // List to keep track of robotNames.
@@ -24,6 +21,7 @@ public class Spark extends Robot {
 
     // mover som flyttar på Spark.
     Mover mover;
+
     public void run() {
 
 
@@ -34,18 +32,24 @@ public class Spark extends Robot {
 
         //noinspection InfiniteLoopStatement
         while (true) {
-            distanceToClosestBot=100_000_000;
             calculateRadar();
 
+            String closestBotName = "";
+            double closestDistance = 100_000_000;
+            double angleToClosestBot = 0;
+            for (int i = 0; i < robotNames.size(); i++) {
+                if (robotNames.get(i).getDistance() < closestDistance) {
+                    closestDistance = robotNames.get(i).getDistance();
+                    closestBotName = robotNames.get(i).getName();
+                    angleToClosestBot = robotNames.get(i).getBearing();
+                }
+            }
 
-            System.out.println("Robot: [" + closetBotName + "]" + " Distance: [" + distanceToClosestBot + "]");
-            System.out.println();
 
-
-
-            if (distanceToClosestBot > 350){
-                mover.moveToClosestRobot(100);
-            } else if (distanceToClosestBot > 200){
+            if (closestDistance > 350) {
+                turnRight(angleToClosestBot);
+                ahead(closestDistance - 100);
+            } else if (closestDistance > 200) {
                 mover.moveToClosestRobot(50);
             } else {
                 mover.doNotMove();
@@ -75,26 +79,21 @@ public class Spark extends Robot {
 
     @Override
     public void onScannedRobot(ScannedRobotEvent e) {
-            mover.updateEnemyPosition(e);
+        mover.updateEnemyPosition(e);
 
 
-            for (int i = 0; i <robotNames.size(); i++) {
-                // IF e's name = first name inside robotNames.
+        for (int i = 0; i < robotNames.size(); i++) {
+            // IF e's name = first name inside robotNames.
             if (e.getName().equals(robotNames.get(i).getName())) {
 
                 // Removes old name from list and adds new.
                 robotNames.remove(i);
                 robotNames.add(e);
-                break;
+                return;
             }
-        }
 
-
-        // Gets the closest bots name and distance.
-        if (e.getDistance() < distanceToClosestBot) {
-            distanceToClosestBot = e.getDistance();
-            closetBotName = e.getName();
         }
+        robotNames.add(e);
 
 
         /*
