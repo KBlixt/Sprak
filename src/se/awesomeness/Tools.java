@@ -2,7 +2,7 @@ package se.awesomeness;
 
 import java.util.List;
 
-public class Algebra {
+public class Tools {
 
     public static double shortestAngle(double angle){
         angle = angle % 360;

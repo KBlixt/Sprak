@@ -89,7 +89,7 @@ public class Vector2D {
 
         double angleToPoint = direction + absoluteAngle;
 
-        return Algebra.shortestAngle(angleToPoint);
+        return Tools.shortestAngle(angleToPoint);
     }
 
     public static Vector2D add(Vector2D[] vectors){
