@@ -30,11 +30,10 @@ public class EnemyRobot {
     public void updateData(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading){
 
         energy = scannedRobot.getEnergy();
-
         position = sparkPosition.addVector(
                 new Vector2D(
                         scannedRobot.getDistance(),
-                        sparkHeading-scannedRobot.getBearing()
+                        sparkHeading+scannedRobot.getBearing()
                 )
         );
         Vector2D oldVelocity = velocity;

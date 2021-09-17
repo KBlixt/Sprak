@@ -5,7 +5,7 @@ public class Vector2D {
     private double direction;
     private double magnitude;
 
-    
+
     public Vector2D(double magnitude, double direction) {
         setVector(magnitude, direction);
     }
@@ -25,9 +25,9 @@ public class Vector2D {
     }
 
     public void setVector(Point freeForm) {
-        magnitude = Math.sqrt(Math.pow(freeForm.getX(),2) + Math.pow(freeForm.getX(),2));
+        magnitude = Math.sqrt(Math.pow(freeForm.getX(),2) + Math.pow(freeForm.getY(),2));
         if (magnitude != 0) {
-            direction = Tools.shortestAngle(Math.toDegrees(Math.asin(freeForm.getY() / magnitude)));
+            direction = Tools.shortestAngle(Math.toDegrees(Math.asin(freeForm.getX() / magnitude)));
         }else{
             direction = 0;
         }
@@ -50,8 +50,8 @@ public class Vector2D {
 
     public Point getFreeForm() {
         return new Point(
-                magnitude * Math.cos(Math.toRadians(direction)),
-                magnitude * Math.sin(Math.toRadians(direction)));
+                magnitude * Math.sin(Math.toRadians(direction)),
+                magnitude * Math.cos(Math.toRadians(direction)));
     }
     
 
@@ -81,7 +81,7 @@ public class Vector2D {
         return new Vector2D(magnitude/denominator, direction);
     }
     
-    public double getAngleToPoint(Point toPoint){
+    public double angleToPoint(Point toPoint){
         Point freeForm = getFreeForm();
         double absoluteAngle = Math.atan2(
                 toPoint.getY() - freeForm.getY(),
