@@ -18,7 +18,7 @@ public class Spark extends RateControlRobot {
 
         //noinspection InfiniteLoopStatement
         while (true){
-            mover.UpdateThreats();
+            mover.UpdateThreats(getTime());
             //do stuff
             execute();
         }
