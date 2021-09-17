@@ -1,7 +1,6 @@
 package se.awesomeness;
 
 import robocode.ScannedRobotEvent;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +10,6 @@ public class Mover {
 
     Map<String, double[]> enemyPositions;
     Spark spark;
-
 
     /** Creates a mover object that can move Spark.
      * @param spark the Spark to move.

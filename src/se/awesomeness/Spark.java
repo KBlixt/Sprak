@@ -9,10 +9,12 @@ import robocode.ScannedRobotEvent;
 public class Spark extends Robot {
 
     RobotStatus status;
+
     // Variables to track distance & name of enemy robots.
     double distanceToClosestBot = 100_000_000;
     String closetBotName = "";
 
+    // mover som flyttar på Spark.
     Mover mover;
     public void run() {
         mover = new Mover(this);
@@ -22,7 +24,10 @@ public class Spark extends Robot {
 
         //noinspection InfiniteLoopStatement
         while (true) {
+            distanceToClosestBot=100_000_000;
             calculateRadar();
+            System.out.println(closetBotName);
+
             if (distanceToClosestBot > 350){
                 mover.moveToClosestRobot(100);
             } else if (distanceToClosestBot > 200){
@@ -31,12 +36,8 @@ public class Spark extends Robot {
                 mover.doNotMove();
             }
 
-            System.out.println(closetBotName);
-            distanceToClosestBot=100_000_000;
-            mover.moveToClosestRobot(50);
         }
     }
-
 
     public void calculateRadar() {
         turnRadarRight(360);
