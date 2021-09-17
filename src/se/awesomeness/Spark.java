@@ -6,6 +6,9 @@ import robocode.StatusEvent;
 
 import robocode.ScannedRobotEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Spark extends Robot {
 
     RobotStatus status;
@@ -14,9 +17,16 @@ public class Spark extends Robot {
     double distanceToClosestBot = 100_000_000;
     String closetBotName = "";
 
+
+
+    // List to keep track of robotNames.
+    List<ScannedRobotEvent> robotNames = new ArrayList<>();
+
     // mover som flyttar på Spark.
     Mover mover;
     public void run() {
+
+
         mover = new Mover(this);
 
         mover.moveToClosestWall(50);
@@ -26,8 +36,12 @@ public class Spark extends Robot {
         while (true) {
             distanceToClosestBot=100_000_000;
             calculateRadar();
+
+
             System.out.println("Robot: [" + closetBotName + "]" + " Distance: [" + distanceToClosestBot + "]");
             System.out.println();
+
+
 
             if (distanceToClosestBot > 350){
                 mover.moveToClosestRobot(100);
@@ -62,6 +76,19 @@ public class Spark extends Robot {
     @Override
     public void onScannedRobot(ScannedRobotEvent e) {
             mover.updateEnemyPosition(e);
+
+
+            for (int i = 0; i <robotNames.size(); i++) {
+                // IF e's name = first name inside robotNames.
+            if (e.getName().equals(robotNames.get(i).getName())) {
+
+                // Removes old name from list and adds new.
+                robotNames.remove(i);
+                robotNames.add(e);
+                break;
+            }
+        }
+
 
         // Gets the closest bots name and distance.
         if (e.getDistance() < distanceToClosestBot) {
