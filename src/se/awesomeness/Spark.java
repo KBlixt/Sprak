@@ -9,6 +9,10 @@ import robocode.ScannedRobotEvent;
 public class Spark extends Robot {
 
     RobotStatus status;
+    // Variables to track distance & name of enemy robots.
+    double distanceToClosestBot = 100_000_000;
+    String closetBotName = "";
+
     Mover mover;
     public void run() {
         mover = new Mover(this);
@@ -18,15 +22,15 @@ public class Spark extends Robot {
 
         //noinspection InfiniteLoopStatement
         while (true) {
-            calulateRadar();
+            System.out.println(closetBotName);
+            distanceToClosestBot=100_000_000;
+            calculateRadar();
         }
     }
 
 
-    public void calulateRadar() {
-
-        // Turns the radar 180 degrees to the right.
-        turnRadarRight(180);
+    public void calculateRadar() {
+        turnRadarRight(360);
 
     }
 
@@ -36,6 +40,7 @@ public class Spark extends Robot {
         // Definiera en metod som kan anropas och löser problemet.
         // Distance to opponent > 350 pixels, fire: 1
 
+        fire(Math.ceil(300 / distanceToEnemy));
     }
 
     @Override
@@ -44,9 +49,17 @@ public class Spark extends Robot {
     }
 
     @Override
-    public void onScannedRobot(ScannedRobotEvent event) {
-        mover.updateEnemyPosition(event);
+    public void onScannedRobot(ScannedRobotEvent e) {
+            mover.updateEnemyPosition(e);
 
+        // Gets the closest bots name and distance.
+        if (e.getDistance() < distanceToClosestBot) {
+            distanceToClosestBot = e.getDistance();
+            closetBotName = e.getName();
+        }
+
+
+/*
 
         // Turns the gun towards our opponent.
         turnGunRight(getHeading() - getGunHeading() + event.getBearing());
@@ -54,6 +67,8 @@ public class Spark extends Robot {
         // Locks in on target, unless something closer gets inside the scanner sight.
         scan();
         resume();
+
+ */
     }
 }
 
