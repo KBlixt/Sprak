@@ -10,7 +10,13 @@ public class Vector2D {
     }
 
     public Vector2D(Point normalForm){
-        setVectorFromPoint(normalForm);
+        setVector(normalForm);
+    }
+
+    public Vector2D(Vector2D vector){
+        direction = vector.getDirection();
+        magnitude = vector.getMagnitude();
+        normalForm = vector.getNormalForm();
     }
 
 
@@ -23,33 +29,42 @@ public class Vector2D {
     }
 
     public Point getNormalForm() {
-        return normalForm;
+        return new Point(normalForm);
     }
 
 
     public void setVector(double magnitude, double direction) {
         this.direction = direction;
         this.magnitude = magnitude;
-        normalForm = new Point(magnitude * Math.cos(Math.toRadians(direction)), magnitude * Math.sin(Math.toRadians(direction)));
+        normalForm = new Point(
+                magnitude * Math.cos(Math.toRadians(direction)),
+                magnitude * Math.sin(Math.toRadians(direction)));
     }
-
-    public void setVectorFromPoint(Point normalForm) {
-        this.normalForm = normalForm;
+    public void setVector(Point normalForm) {
+        this.normalForm = new Point(normalForm);
         magnitude = Math.sqrt(Math.pow(normalForm.x,2) + Math.pow(normalForm.x,2));
-        direction = Math.asin(normalForm.y/magnitude);
+        if (magnitude != 0) {
+            direction = Math.toDegrees(Math.asin(normalForm.y / magnitude));
+        }else{
+            direction = 0;
+        }
     }
 
 
-    public void addVector(Vector2D vectorToAdd){
-        setVectorFromPoint(new Point(
+    public Vector2D addVector(Vector2D vectorToAdd){
+        return new Vector2D( new Point(
                 normalForm.x + vectorToAdd.getNormalForm().x,
                 normalForm.y + vectorToAdd.getNormalForm().y));
     }
 
-    public void subtractVector(Vector2D VectorToSubtract){
-        setVectorFromPoint(new Point(
-                normalForm.x - VectorToSubtract.getNormalForm().x,
-                normalForm.y - VectorToSubtract.getNormalForm().y));
+    public Vector2D subtractVector(Vector2D vector){
+        return new Vector2D( new Point(
+                normalForm.x + vector.getNormalForm().x,
+                normalForm.y + vector.getNormalForm().y));
+    }
+
+    public Vector2D negativ(){
+        return new Vector2D(magnitude, -direction);
     }
 
 
@@ -64,4 +79,13 @@ public class Vector2D {
 
         return Algebra.shortestAngle(angleToPoint);
     }
+
+    public static Vector2D add(Vector2D[] vectors){
+        Vector2D sumVector = new Vector2D(new Point(0,0));
+        for (Vector2D vector : vectors) {
+            sumVector.addVector(vector);
+        }
+        return sumVector;
+    }
+
 }
