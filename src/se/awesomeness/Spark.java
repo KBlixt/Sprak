@@ -13,9 +13,12 @@ public class Spark extends RateControlRobot {
     Map<String, EnemyRobot> enemyRobots;
 
     public void run(){
+        ThreatBasedMovement mover = new ThreatBasedMovement(this);
 
         //noinspection InfiniteLoopStatement
         while (true){
+            mover.UpdateThreats();
+            //do stuff
             execute();
         }
 
