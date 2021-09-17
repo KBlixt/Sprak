@@ -22,9 +22,19 @@ public class Spark extends Robot {
 
         //noinspection InfiniteLoopStatement
         while (true) {
+
+            if (distanceToClosestBot > 350){
+                mover.moveToClosestRobot(100);
+            } else if (distanceToClosestBot > 200){
+                mover.moveToClosestRobot(50);
+            } else {
+                mover.doNotMove();
+            }
+
             System.out.println(closetBotName);
             distanceToClosestBot=100_000_000;
             calculateRadar();
+            mover.moveToClosestRobot(50);
         }
     }
 
@@ -59,16 +69,14 @@ public class Spark extends Robot {
         }
 
 
-/*
-
+        /*
         // Turns the gun towards our opponent.
         turnGunRight(getHeading() - getGunHeading() + event.getBearing());
         calculateFire(event.getDistance());
         // Locks in on target, unless something closer gets inside the scanner sight.
         scan();
         resume();
-
- */
+        */
     }
 }
 

@@ -1,9 +1,6 @@
 package se.awesomeness;
 
-import robocode.Robot;
-import robocode.RobotStatus;
 import robocode.ScannedRobotEvent;
-import robocode.StatusEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,8 +20,9 @@ public class Mover {
         double X =  spark.getX() + robot.getDistance() * Math.sin(Math.toRadians(spark.getHeading() + robot.getBearing()));
         double Y =  spark.getY() + robot.getDistance() * Math.cos(Math.toRadians(spark.getHeading() + robot.getBearing()));
         enemyPositions.put(robot.getName(), new double[]{X, Y});
-        System.out.println( X + " " + Y);
     }
+
+    public void doNotMove(){}
 
     public void moveToClosestRobot(double stopEarlyOffset){
         String closestRobotName = "";
@@ -48,9 +46,8 @@ public class Mover {
         }
         double[] target = enemyPositions.get(closestRobotName);
 
-
-        spark.turnRight(getAngleToPoint(target[0], target[1]));
-        spark.ahead(shortestDistance - stopEarlyOffset -1);
+        spark.turnRight(shortestAngle(spark.getHeading(), getAngleToPoint(target[0], target[1])));
+        spark.ahead(shortestDistance - stopEarlyOffset);
     }
 
     /**returns an angle to the closest wall, need some information about the robot and walls.*/
@@ -126,8 +123,18 @@ public class Mover {
         if (angleToPoint > 180){
             angleToPoint = angleToPoint - 360;
         }
-        System.out.println(angleToPoint);
         return angleToPoint;
+    }
+
+    private double shortestAngle(double fromAngle, double toAngle){
+        double angleDelta = toAngle - fromAngle;
+        if (angleDelta < -180){
+            return -angleDelta + 360;
+        }else if ( angleDelta > 180){
+            return  -angleDelta -360;
+        }else{
+            return angleDelta;
+        }
     }
 
 }
