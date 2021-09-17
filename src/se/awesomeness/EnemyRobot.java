@@ -3,42 +3,63 @@ package se.awesomeness;
 import robocode.ScannedRobotEvent;
 
 public class EnemyRobot {
-    Point position;
-    Velocity velocity;
-    Acceleration acceleration;
-    double energy;
+
     String name;
+    double energy;
+    long lastUpdate;
+
+    Point position;
+    Vector2D velocity;
+    Vector2D acceleration;
+
     ThreatInfo threatInfo;
-    int LastUpdate;
 
-
-
-    public EnemyRobot(String name){
-        this.name = name;
+    public EnemyRobot(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading){
+        velocity = new Vector2D(scannedRobot.getVelocity(), scannedRobot.getHeading());
+        threatInfo = new ThreatInfo();
+        updateData(scannedRobot, sparkPosition, sparkHeading);
     }
-    public void updateData(ScannedRobotEvent scannedRobot){
+
+    public void updateData(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading){
+
+        energy = scannedRobot.getEnergy();
+
+        position = sparkPosition.addVector(
+                new Vector2D(
+                        scannedRobot.getDistance(),
+                        sparkHeading-scannedRobot.getBearing()
+                )
+        );
+        Vector2D oldVelocity = velocity;
+        velocity = new Vector2D(scannedRobot.getVelocity(), scannedRobot.getHeading());
+
+        long timeDelta = scannedRobot.getTime() - lastUpdate;
+        acceleration = velocity.subtractVector(oldVelocity).divide(timeDelta);
+
+        lastUpdate = scannedRobot.getTime();
 
     }
-    public Point getEstimatedPosition(long turn){
-        double[] velVector = Velocity.getVelocityVector(velocity);
-        double[] accVector = Acceleration.getAccelerationVector(acceleration);
-        double x = position.x + velVector[0]*(turn-LastUpdate) + accVector[0]*Math.pow(turn-LastUpdate, 1.5);
-        double y = position.y + velVector[1]*(turn-LastUpdate) + accVector[1]*Math.pow(turn-LastUpdate, 1.5);
-        return new Point(x,y);
+
+
+    public Point estimatedPosition(long time){
+            return new Point(
+                    position.addVector(velocity.multiply(time - lastUpdate))
+            );
+            // todo: adjust for acceleration?
 
     }
-    public Velocity getEstimatedVelocity(long turn){
-        double[] velVector = Velocity.getVelocityVector(velocity);
-        double[] accVector = Acceleration.getAccelerationVector(acceleration);
-        return Velocity.getVelocityWithVector(
-                velVector[0]+accVector[0]*(turn-LastUpdate),
-                velVector[1]+accVector[1]*(turn-LastUpdate));
+
+    public Vector2D estimatedVelocity(long time){
+        Vector2D estimatedVelocity = new Vector2D(
+                velocity.addVector(acceleration.multiply(time - lastUpdate))
+        );
+        estimatedVelocity.setVector(Math.max(8,estimatedVelocity.getMagnitude()), estimatedVelocity.getDirection());
+        return estimatedVelocity;
     }
+
+
     public ThreatInfo getThreatInfo(){
         return threatInfo;
-    }
-    public void setThreatInfo(ThreatInfo threatInfo){
-        this.threatInfo = threatInfo;
     }
 
 
