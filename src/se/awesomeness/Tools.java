@@ -1,7 +1,5 @@
 package se.awesomeness;
 
-import java.util.List;
-
 public class Tools {
 
     public static double shortestAngle(double angle){
