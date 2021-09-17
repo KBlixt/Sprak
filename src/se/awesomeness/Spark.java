@@ -22,7 +22,7 @@ public class Spark extends Robot {
 
         //noinspection InfiniteLoopStatement
         while (true) {
-
+            calculateRadar();
             if (distanceToClosestBot > 350){
                 mover.moveToClosestRobot(100);
             } else if (distanceToClosestBot > 200){
@@ -33,7 +33,6 @@ public class Spark extends Robot {
 
             System.out.println(closetBotName);
             distanceToClosestBot=100_000_000;
-            calculateRadar();
             mover.moveToClosestRobot(50);
         }
     }
