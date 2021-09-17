@@ -40,6 +40,7 @@ public class Vector2D {
                 magnitude * Math.cos(Math.toRadians(direction)),
                 magnitude * Math.sin(Math.toRadians(direction)));
     }
+
     public void setVector(Point normalForm) {
         this.normalForm = new Point(normalForm);
         magnitude = Math.sqrt(Math.pow(normalForm.x,2) + Math.pow(normalForm.x,2));
@@ -63,8 +64,19 @@ public class Vector2D {
                 normalForm.y + vector.getNormalForm().y));
     }
 
-    public Vector2D negativ(){
+    public Vector2D negate(){
         return new Vector2D(magnitude, -direction);
+    }
+
+    public Vector2D multiply(double factor){
+        return new Vector2D(magnitude*factor, direction);
+    }
+
+    public Vector2D divide(double denominator){
+        if(denominator == 0){
+            denominator = 0.000001;
+        }
+        return new Vector2D(magnitude/denominator, direction);
     }
 
 
@@ -83,7 +95,7 @@ public class Vector2D {
     public static Vector2D add(Vector2D[] vectors){
         Vector2D sumVector = new Vector2D(new Point(0,0));
         for (Vector2D vector : vectors) {
-            sumVector.addVector(vector);
+            sumVector = sumVector.addVector(vector);
         }
         return sumVector;
     }
