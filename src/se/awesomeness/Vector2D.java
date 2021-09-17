@@ -30,9 +30,12 @@ public class Vector2D {
     }
 
     public void setVector(Point freeForm) {
-        magnitude = Math.sqrt(Math.pow(freeForm.getX(),2) + Math.pow(freeForm.getY(),2));
+        double x = freeForm.getX();
+        double y = freeForm.getY();
+
+        magnitude = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
         if (magnitude != 0) {
-            direction = Tools.shortestAngle(Math.toDegrees(Math.asin(freeForm.getX() / magnitude)));
+            direction = Tools.shortestAngle(90-Math.toDegrees(Math.atan2(y,x)));
         }else{
             direction = 0;
         }
@@ -62,9 +65,11 @@ public class Vector2D {
 
     public Vector2D addVector(Vector2D vectorToAdd){
         Point freeForm = getFreeForm();
+        Point vectorToAddFreeForm = vectorToAdd.getFreeForm();
+
         return new Vector2D( new Point(
-                freeForm.getX() + vectorToAdd.getFreeForm().getX(),
-                freeForm.getY() + vectorToAdd.getFreeForm().getY()));
+                freeForm.getX() + vectorToAddFreeForm.getX(),
+                freeForm.getY() + vectorToAddFreeForm.getY()));
     }
 
     public Vector2D subtractVector(Vector2D vector){
