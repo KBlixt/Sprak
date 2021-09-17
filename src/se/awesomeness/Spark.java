@@ -4,7 +4,7 @@ import robocode.*;
 
 import java.util.List;
 
-public class Spark extends AdvancedRobot {
+public class Spark extends RateControlRobot {
     RobotStatus status;
 
     List<MovePolicy> movePolicies = List.of(
@@ -30,10 +30,8 @@ public class Spark extends AdvancedRobot {
 
         Velocity targetVelocity = mover.getNextMovement(movePolicies);
 
-        setMaxTurnRate(targetVelocity.direction);
-        setTurnRight(targetVelocity.direction);
-        setMaxVelocity(targetVelocity.speed);
-        setAhead(800*targetVelocity.speed);
+        setTurnRate(targetVelocity.direction);
+        setVelocityRate(targetVelocity.speed);
     }
 
     public void calculateRadar(){
@@ -45,6 +43,8 @@ public class Spark extends AdvancedRobot {
     public void onStatus(StatusEvent e) {
         this.status = e.getStatus();
     }
+
+
 
 
 }

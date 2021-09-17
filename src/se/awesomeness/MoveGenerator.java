@@ -40,7 +40,7 @@ public class MoveGenerator {
             if (targetPoint == null) {
                 targetPoint = getRandomPoint(boardX, boardY);
             }
-            if (Algebra.getDistanceToPoint(robotPoint, targetPoint) < 40) {
+            if (Algebra.distanceToPoint(robotPoint, targetPoint) < 40) {
                 targetPoint = getRandomPoint(boardX, boardY);
             }
             moveTowardsTargetPoint(movePolicies.contains(MovePolicy.ALLOW_FAST_COURSE_CHANGE));
