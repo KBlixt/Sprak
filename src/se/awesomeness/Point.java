@@ -75,7 +75,4 @@ public class Point {
         return Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
     }
 
-
-
-
 }

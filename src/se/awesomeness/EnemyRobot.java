@@ -15,13 +15,13 @@ public class EnemyRobot {
     double threatPointDistance;
     double threatPointSpeed;
 
+
     public EnemyRobot(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading){
         name = scannedRobot.getName();
         velocity = new Vector2D(scannedRobot.getVelocity(), scannedRobot.getHeading());
-        threatPointDistance = 0;
-        threatPointSpeed = 0;
         updateData(scannedRobot, sparkPosition, sparkHeading);
     }
+
 
     public void updateData(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading){
 
@@ -43,6 +43,27 @@ public class EnemyRobot {
 
     }
 
+    public void setThreatPointDistance(double threatPointDistance) {
+        this.threatPointDistance = threatPointDistance;
+    }
+
+    public void setThreatPointSpeed(double threatPointSpeed) {
+        this.threatPointSpeed = threatPointSpeed;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public double getThreatPointDistance() {
+        return threatPointDistance;
+    }
+
+    public double getThreatPointSpeed() {
+        return threatPointSpeed;
+    }
+
 
     public Point estimatedPosition(long time){
             return new Point(
@@ -59,24 +80,5 @@ public class EnemyRobot {
         estimatedVelocity.setVector(Math.max(8,estimatedVelocity.getMagnitude()), estimatedVelocity.getDirection());
         return estimatedVelocity;
     }
-    
-    public double getThreatPointDistance() {
-        return threatPointDistance;
-    }
 
-    public void setThreatPointDistance(double threatPointDistance) {
-        this.threatPointDistance = threatPointDistance;
-    }
-
-    public double getThreatPointSpeed() {
-        return threatPointSpeed;
-    }
-
-    public void setThreatPointSpeed(double threatPointSpeed) {
-        this.threatPointSpeed = threatPointSpeed;
-    }
-
-    public String getName() {
-        return name;
-    }
 }
