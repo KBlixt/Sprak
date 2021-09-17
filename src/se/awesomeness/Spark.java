@@ -2,6 +2,7 @@ package se.awesomeness;
 
 import robocode.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ public class Spark extends RateControlRobot {
 
     Point position = new Point(0,0);
     Vector2D velocityVector = new Vector2D(0,0);
+    List<String> deadRobots = new ArrayList<>();
 
     Map<String, EnemyRobot> enemyRobots;
 
@@ -28,11 +30,15 @@ public class Spark extends RateControlRobot {
     public void onStatus(StatusEvent event) {
         position.setPoint(getX(), getY());
         velocityVector.setVector(getVelocity(), getHeading());
+        super.onStatus(event);
     }
 
     @Override
     public void onScannedRobot(ScannedRobotEvent event) {
         String robotName = event.getName();
+        if (deadRobots.contains(robotName)){
+            return;
+        }
 
         if (!enemyRobots.containsKey(robotName)){
             enemyRobots.put(robotName, new EnemyRobot(event, position, getHeading()));
@@ -41,4 +47,11 @@ public class Spark extends RateControlRobot {
         }
     }
 
+    @Override
+    public void onRobotDeath(RobotDeathEvent event) {
+        String deadRobotName = event.getName();
+        deadRobots.add(deadRobotName);
+        enemyRobots.remove(deadRobotName);
+        super.onRobotDeath(event);
+    }
 }
