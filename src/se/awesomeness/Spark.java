@@ -3,48 +3,39 @@ package se.awesomeness;
 import robocode.*;
 
 import java.util.List;
+import java.util.Map;
 
 public class Spark extends RateControlRobot {
-    RobotStatus status;
 
-    List<MovePolicy> movePolicies = List.of(
-            MovePolicy.MOVE_TO_RANDOM_POINTS,
-            MovePolicy.ALLOW_FAST_COURSE_CHANGE);
+    Point position = new Point(0,0);
+    Vector2D velocityVector = new Vector2D(0,0);
+
+    Map<String, EnemyRobot> enemyRobots;
 
     public void run(){
-        MoveGenerator mover = new MoveGenerator(getBattleFieldWidth(), getBattleFieldHeight());
 
         //noinspection InfiniteLoopStatement
         while (true){
-
-            calculateMove(mover);
-            calculateRadar();
-            calculateFire();
             execute();
         }
 
     }
 
-    public void calculateMove(MoveGenerator mover){
-        mover.updateStatus(status);
-
-        Velocity targetVelocity = mover.getNextMovement(movePolicies);
-
-        setTurnRate(targetVelocity.direction);
-        setVelocityRate(targetVelocity.speed);
+    @Override
+    public void onStatus(StatusEvent event) {
+        position.setPoint(getX(), getY());
+        velocityVector.setVector(getVelocity(), getHeading());
     }
 
-    public void calculateRadar(){
+    @Override
+    public void onScannedRobot(ScannedRobotEvent event) {
+        String robotName = event.getName();
+
+        if (!enemyRobots.containsKey(robotName)){
+            enemyRobots.put(robotName, new EnemyRobot(event, position, getHeading()));
+        }else{
+            enemyRobots.get(robotName).updateData(event, position, getHeading());
+        }
     }
-
-    public void calculateFire(){
-    }
-
-    public void onStatus(StatusEvent e) {
-        this.status = e.getStatus();
-    }
-
-
-
 
 }
