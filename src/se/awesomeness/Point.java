@@ -7,21 +7,32 @@ public class Point {
     double y;
 
     public Point(double x, double y){
+        setPoint(x,y);
+    }
+
+    public Point(Point point){
+        setPoint(point.x, point.y);
+    }
+
+
+    public void setPoint(double x, double y){
         this.x = x;
         this.y = y;
     }
 
 
-    public void addVector(Vector2D vector){
-        x = x + vector.getNormalForm().x;
-        y = y + vector.getNormalForm().y;
+    public Point addVector(Vector2D vector){
+        return new Point(
+                x + vector.getNormalForm().x,
+                y + vector.getNormalForm().y);
     }
 
-    public void subtractVector(Vector2D vector){
-        x = x - vector.getNormalForm().x;
-        y = y - vector.getNormalForm().y;
+    public Point subtractVector(Vector2D vector){
+        return new Point(
+                x - vector.getNormalForm().x,
+                y - vector.getNormalForm().y);
     }
-
+    
 
     public Point closestPoint(List<Point> points){
         int closestPointIndex = 0;
@@ -50,6 +61,7 @@ public class Point {
 
         return Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
     }
+
 
 
 
