@@ -1,9 +1,9 @@
 package se.awesomeness;
 
 public class Vector2D {
-    
-    private double direction;
+
     private double magnitude;
+    private double direction;
 
 
     public Vector2D(double magnitude, double direction) {
@@ -16,6 +16,11 @@ public class Vector2D {
 
     public Vector2D(Vector2D vector){
         setVector(vector);
+    }
+
+    public Vector2D(){
+        direction = 0;
+        magnitude = 0;
     }
 
 
@@ -95,11 +100,15 @@ public class Vector2D {
     }
 
     public static Vector2D addAll(Vector2D[] vectors){
-        Vector2D sumVector = new Vector2D(new Point(0,0));
+        Vector2D sumVector = new Vector2D();
         for (Vector2D vector : vectors) {
             sumVector = sumVector.addVector(vector);
         }
         return sumVector;
+    }
+
+    public String toString(){
+        return "[vector]: (Magnitude: " + getMagnitude() + " , Direction: " + getDirection() + ")";
     }
 
 }
