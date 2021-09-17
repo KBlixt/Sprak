@@ -3,15 +3,17 @@ package se.awesomeness;
 import java.util.List;
 
 public class Point {
-    double x;
-    double y;
+
+    private double x;
+    private double y;
+
 
     public Point(double x, double y){
         setPoint(x,y);
     }
 
     public Point(Point point){
-        setPoint(point.x, point.y);
+        setPoint(point);
     }
 
 
@@ -20,19 +22,29 @@ public class Point {
         this.y = y;
     }
 
+    public void setPoint(Point point){
+        setPoint(point.getX(), point.getY());
+    }
+
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
 
     public Point addVector(Vector2D vector){
         return new Point(
-                x + vector.getNormalForm().x,
-                y + vector.getNormalForm().y);
+                getX() + vector.getFreeForm().getX(),
+                getY() + vector.getFreeForm().getY());
     }
 
     public Point subtractVector(Vector2D vector){
-        return new Point(
-                x - vector.getNormalForm().x,
-                y - vector.getNormalForm().y);
+        return addVector(vector.negate());
     }
-    
 
     public Point closestPoint(List<Point> points){
         int closestPointIndex = 0;
@@ -55,6 +67,7 @@ public class Point {
         }
         return points.get(closestPointIndex);
     }
+
     public double distanceToPoint(Point toPoint){
         double deltaX = Math.abs(x - toPoint.x);
         double deltaY = Math.abs(y - toPoint.y);
