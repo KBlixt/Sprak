@@ -9,4 +9,8 @@ public class Tools {
         }
         return angle;
     }
+
+    public static double convertAngle(double angle){
+        return 90-angle;
+    }
 }
