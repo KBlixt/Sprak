@@ -48,12 +48,12 @@ public class Vector {
     }
 
 
-    public double getDirection() {
-        return direction;
-    }
-
     public double getMagnitude() {
         return magnitude;
+    }
+
+    public double getDirection() {
+        return direction;
     }
 
     public Point getFreeForm() {
