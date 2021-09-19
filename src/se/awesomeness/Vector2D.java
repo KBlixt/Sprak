@@ -61,7 +61,7 @@ public class Vector2D {
                 magnitude * Math.sin(Math.toRadians(direction)),
                 magnitude * Math.cos(Math.toRadians(direction)));
     }
-    
+
 
     public Vector2D addVector(Vector2D vectorToAdd){
         Point freeForm = getFreeForm();
@@ -77,7 +77,7 @@ public class Vector2D {
     }
 
     public Vector2D negate(){
-        return new Vector2D(magnitude, -direction);
+        return new Vector2D(magnitude, Tools.shortestAngle(direction-180));
     }
 
     public Vector2D multiply(double factor){
@@ -104,6 +104,10 @@ public class Vector2D {
         return Tools.shortestAngle(angleToPoint);
     }
 
+    public String toString(){
+        return "[vector]: (Magnitude: " + getMagnitude() + " , Direction: " + getDirection() + ")";
+    }
+
     public static Vector2D addAll(Vector2D[] vectors){
         Vector2D sumVector = new Vector2D();
         for (Vector2D vector : vectors) {
@@ -111,9 +115,4 @@ public class Vector2D {
         }
         return sumVector;
     }
-
-    public String toString(){
-        return "[vector]: (Magnitude: " + getMagnitude() + " , Direction: " + getDirection() + ")";
-    }
-
 }
