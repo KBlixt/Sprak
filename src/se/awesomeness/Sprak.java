@@ -9,7 +9,7 @@ import java.util.Map;
 public class Sprak extends RateControlRobot {
 
     Point position = new Point();
-    Vector2D velocityVector = new Vector2D();
+    Vector normalVelocity = new Vector();
 
     Map<String, EnemyRobot> enemyRobots;
     List<String> deadRobots = new ArrayList<>();
@@ -18,7 +18,6 @@ public class Sprak extends RateControlRobot {
         enemyRobots = new HashMap<>();
         ThreatBasedMovement mover = new ThreatBasedMovement(this);
         setRadarRotationRate(45);
-
         //noinspection InfiniteLoopStatement
         while (true){
             mover.UpdateThreats(getTime());
@@ -31,7 +30,7 @@ public class Sprak extends RateControlRobot {
     @Override
     public void onStatus(StatusEvent event) {
         position.setPoint(getX(), getY());
-        velocityVector.setVector(getVelocity(), getHeading());
+        normalVelocity.setVector(getVelocity(), Tools.convertAngle(getHeading()));
         super.onStatus(event);
     }
 
@@ -41,9 +40,9 @@ public class Sprak extends RateControlRobot {
 
         if (!deadRobots.contains(robotName)){
             if (!enemyRobots.containsKey(robotName)){
-                enemyRobots.put(robotName, new EnemyRobot(event, position, getHeading()));
+                enemyRobots.put(robotName, new EnemyRobot(event, position, normalVelocity.getDirection()));
             }else{
-                enemyRobots.get(robotName).updateData(event, position, getHeading());
+                enemyRobots.get(robotName).updateData(event, position, normalVelocity.getDirection());
             }
         }
 

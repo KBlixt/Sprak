@@ -11,8 +11,8 @@ public class EnemyRobot {
     private long lastUpdateTime;
 
     private Point position;
-    private Vector2D velocity;
-    private Vector2D acceleration;
+    private Vector velocity;
+    private Vector acceleration;
 
     private double threatDistance;
     private double threatDistanceSpeed;
@@ -22,7 +22,7 @@ public class EnemyRobot {
     public EnemyRobot(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading){
         name = scannedRobot.getName();
         threatDistance = -1;
-        velocity = new Vector2D(scannedRobot.getVelocity(), scannedRobot.getHeading());
+        velocity = new Vector(scannedRobot.getVelocity(), Tools.convertAngle(scannedRobot.getHeading()));
         updateData(scannedRobot, sparkPosition, sparkHeading);
     }
 
@@ -31,16 +31,16 @@ public class EnemyRobot {
 
         energy = scannedRobot.getEnergy();
         position = sparkPosition.addVector(
-                new Vector2D(
+                new Vector(
                         scannedRobot.getDistance(),
-                        sparkHeading+scannedRobot.getBearing()
+                        sparkHeading+Tools.convertAngle(scannedRobot.getBearing())
                 )
         );
-        Vector2D oldVelocity = velocity;
-        velocity = new Vector2D(scannedRobot.getVelocity(), scannedRobot.getHeading());
+        Vector oldVelocity = velocity;
+        velocity = new Vector(scannedRobot.getVelocity(), Tools.convertAngle(scannedRobot.getHeading()));
 
         long timeDelta = scannedRobot.getTime() - lastUpdateTime;
-        acceleration = velocity.subtractVector(oldVelocity).divide(timeDelta);
+        acceleration = velocity.subtract(oldVelocity).divide(timeDelta);
 
         lastUpdateTime = scannedRobot.getTime();
 
@@ -96,12 +96,11 @@ public class EnemyRobot {
 
     }
 
-    public Vector2D estimatedVelocity(long time){
-        Vector2D estimatedVelocity = new Vector2D(
-                velocity.addVector(acceleration.multiply(time - lastUpdateTime))
+    public Vector estimatedVelocity(long time){
+        Vector estimatedVelocity = new Vector(
+                velocity.add(acceleration.multiply(time - lastUpdateTime))
         );
         estimatedVelocity.setVector(Math.max(8,estimatedVelocity.getMagnitude()), estimatedVelocity.getDirection());
         return estimatedVelocity;
     }
-
 }

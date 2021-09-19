@@ -41,14 +41,14 @@ public class Point {
     }
 
 
-    public Point addVector(Vector2D vector){
+    public Point addVector(Vector vector){
         return new Point(
                 getX() + vector.getFreeForm().getX(),
                 getY() + vector.getFreeForm().getY());
     }
 
-    public Point subtractVector(Vector2D vector){
-        return addVector(vector.negate());
+    public Point subtractVector(Vector vector){
+        return addVector(vector.negative());
     }
 
     public Point closestPoint(List<Point> points){

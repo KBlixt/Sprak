@@ -1,24 +1,24 @@
 package se.awesomeness;
 
-public class Vector2D {
+public class Vector {
 
     private double magnitude;
     private double direction;
 
 
-    public Vector2D(double magnitude, double direction) {
+    public Vector(double magnitude, double direction) {
         setVector(magnitude, direction);
     }
 
-    public Vector2D(Point freeForm){
+    public Vector(Point freeForm){
         setVector(freeForm);
     }
 
-    public Vector2D(Vector2D vector){
+    public Vector(Vector vector){
         setVector(vector);
     }
 
-    public Vector2D(){
+    public Vector(){
         direction = 0;
         magnitude = 0;
     }
@@ -35,18 +35,18 @@ public class Vector2D {
 
         magnitude = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
         if (magnitude != 0) {
-            direction = Tools.shortestAngle(90-Math.toDegrees(Math.atan2(y,x)));
+            direction = Tools.shortestAngle(Math.toDegrees(Math.atan2(y,x)));
         }else{
             direction = 0;
         }
     }
-    
-    public void setVector(Vector2D vector){
+
+    public void setVector(Vector vector){
         setVector(
                 vector.getDirection(),
                 vector.getMagnitude());
     }
-    
+
 
     public double getDirection() {
         return direction;
@@ -63,41 +63,41 @@ public class Vector2D {
     }
 
 
-    public Vector2D addVector(Vector2D vectorToAdd){
+    public Vector add(Vector vectorToAdd){
         Point freeForm = getFreeForm();
         Point vectorToAddFreeForm = vectorToAdd.getFreeForm();
 
-        return new Vector2D( new Point(
+        return new Vector( new Point(
                 freeForm.getX() + vectorToAddFreeForm.getX(),
                 freeForm.getY() + vectorToAddFreeForm.getY()));
     }
 
-    public Vector2D subtractVector(Vector2D vector){
-        return addVector(vector.negate());
+    public Vector subtract(Vector vector){
+        return add(vector.negative());
     }
 
-    public Vector2D negate(){
-        return new Vector2D(magnitude, Tools.shortestAngle(direction-180));
+    public Vector negative(){
+        return new Vector(magnitude, Tools.shortestAngle(direction-180));
     }
 
-    public Vector2D multiply(double factor){
-        return new Vector2D(magnitude*factor, direction);
+    public Vector multiply(double factor){
+        return new Vector(magnitude*factor, direction);
     }
 
-    public Vector2D divide(double denominator){
+    public Vector divide(double denominator){
         if(denominator == 0){
             denominator = 0.000001;
         }
-        return new Vector2D(magnitude/denominator, direction);
+        return new Vector(magnitude/denominator, direction);
     }
-    
+
     public double angleToPoint(Point toPoint){
         Point freeForm = getFreeForm();
         double absoluteAngle = Math.atan2(
                 toPoint.getY() - freeForm.getY(),
                 toPoint.getX() - freeForm.getX());
 
-        absoluteAngle = Math.toDegrees(-absoluteAngle) + 90;
+        absoluteAngle = Math.toDegrees(absoluteAngle);
 
         double angleToPoint = direction + absoluteAngle;
 
@@ -108,10 +108,10 @@ public class Vector2D {
         return "[vector]: (Magnitude: " + getMagnitude() + " , Direction: " + getDirection() + ")";
     }
 
-    public static Vector2D addAll(Vector2D[] vectors){
-        Vector2D sumVector = new Vector2D();
-        for (Vector2D vector : vectors) {
-            sumVector = sumVector.addVector(vector);
+    public static Vector addAll(Vector[] vectors){
+        Vector sumVector = new Vector();
+        for (Vector vector : vectors) {
+            sumVector = sumVector.add(vector);
         }
         return sumVector;
     }
