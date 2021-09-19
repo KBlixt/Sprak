@@ -57,9 +57,9 @@ public class Vector {
     }
 
     public Point getFreeForm() {
-        return new Point(
-                magnitude * Math.sin(Math.toRadians(direction)),
-                magnitude * Math.cos(Math.toRadians(direction)));
+        double x = magnitude * Math.cos(Math.toRadians(direction));
+        double y = magnitude * Math.sin(Math.toRadians(direction));
+        return new Point(x, y);
     }
 
 
