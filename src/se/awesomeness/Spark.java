@@ -22,6 +22,9 @@ public class Spark extends Robot {
     // mover som flyttar på Spark.
     Mover mover;
 
+    //Värde på hur många fiender det är på planen
+    int opponentsLeft;
+
     public void run() {
 
 
@@ -33,6 +36,7 @@ public class Spark extends Robot {
         while (true) {
             calculateRadar();
 
+            opponentsLeft = getOthers();
             String closestBotName = "";
             double closestDistance = 100_000_000;
             double angleToClosestBot = 0;
