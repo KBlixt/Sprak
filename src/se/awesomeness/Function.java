@@ -4,56 +4,74 @@ public record Function(FunctionType type, double speed, double value) {
 
     public Point closestPoint(Point point) {
         Vector pointVector = new Vector(point);
-        double adjustVectorMagnitude;
-        double adjustVectorDirection;
+        Vector adjustVector;
 
         switch (type) {
             case X_ACC_LIMIT -> {
-                adjustVectorMagnitude = (speed + value) - pointVector.getMagnitude();
-                adjustVectorDirection = pointVector.getDirection();
+                double maxTurn = 10 - 0.75 * Math.abs(speed);
 
-                double maxTurn = 10 - 0.75 * speed;
-                if (adjustVectorDirection > maxTurn) {
-                    return new Point(new Vector((speed + value), maxTurn).getFreeForm());
-                } else if (adjustVectorDirection < -maxTurn) {
-                    return new Point(new Vector((speed + value), -maxTurn).getFreeForm());
+                if (speed + value > 0){
+                    adjustVector = new Vector(speed + value, pointVector.getDirection()).subtract(pointVector);
+                    if (pointVector.getDirection() > maxTurn) {
+                        return new Point(new Vector((speed + value), maxTurn).getFreeForm());
+                    } else if (pointVector.getDirection() < -maxTurn) {
+                        return new Point(new Vector((speed + value), -maxTurn).getFreeForm());
+                    }
+                }else if(speed + value < 0){
+                    adjustVector = new Vector(speed + value, pointVector.getDirection()).negative().subtract(pointVector);
+                    if (Tools.shortestAngle(pointVector.getDirection()-180) < -maxTurn) {
+                        return new Point(new Vector((speed + value), -maxTurn).getFreeForm());
+                    } else if (Tools.shortestAngle(pointVector.getDirection()-180) > maxTurn) {
+                        return new Point(new Vector((speed + value), maxTurn).getFreeForm());
+                    }
+                }else{
+                    return new Point();
                 }
             }
             case Y_ACC_LIMIT -> {
-                adjustVectorMagnitude = Math.sin(Math.toRadians(pointVector.getDirection() - value * (10 - 0.75 * speed))) * pointVector.getMagnitude();
-                adjustVectorDirection = value * (10 - 0.75 * speed) - 90;
+                double adjustVectorMagnitude = Math.sin(Math.toRadians(pointVector.getDirection() - value * (10 - 0.75 * speed))) * pointVector.getMagnitude();
+                double adjustVectorDirection = value * (10 - 0.75 * speed) - 90;
+                adjustVector = new Vector(adjustVectorMagnitude, adjustVectorDirection);
             }
             default -> {
-                adjustVectorMagnitude = 1;
-                adjustVectorDirection = 1;
+                adjustVector = new Vector(new Point(1,1));
                 System.out.println("<ERROR> no type match in switch in Function.closestPoint. type: " + type.name());
             }
         }
 
-        Vector adjustVector = new Vector(adjustVectorMagnitude, adjustVectorDirection);
         Vector test = pointVector.add(adjustVector);
         return test.getFreeForm();
     }
 
     public boolean withinFunction(Point point) {
         Vector pointVector = new Vector(point);
-        double magnitude = Tools.round(pointVector.getMagnitude());
-        double direction = Tools.round(pointVector.getDirection());
+        double magnitude = pointVector.getMagnitude();
+        double direction = pointVector.getDirection();
+        double margin = 0.999999999;
 
         switch (type) {
             case X_ACC_LIMIT -> {
-                if (value >= 0) {
-                    return magnitude * 0.999999999 <= speed + value;
-                } else {
-                    return magnitude * 1.000000001 >= speed + value;
+                if (direction > 90 || direction < -90){
+                    magnitude *= -1;
                 }
+                if (speed+value < 0){
+                    margin = 1/margin;
+                }
+                if (value > 0) {
+                    return magnitude*margin <= (speed + value);
+                }else if (value < 0){
+                    return magnitude/margin >= speed + value;
+                }else{
+                    return Math.abs(magnitude)*margin < Math.abs(speed);
+                }
+
             }
             case Y_ACC_LIMIT -> {
-                if (value >= 0) {
-                    return direction * 0.999999999 <= value * (10 - 0.75 * speed);
-                } else {
-                    return direction * 1.000000001 >= value * (10 - 0.75 * speed);
+                if (direction > 90 || direction < -90){
+                    direction = Tools.shortestAngle(180-direction);
                 }
+                return direction * 0.999999999 * value <= value * value * (10 - 0.75 * speed);
+
             }
             default -> {
                 System.out.println("<ERROR> no type match in switch in Function.withinFunction. type: " + type.name());

@@ -19,50 +19,77 @@ public class ThreatBasedMovement {
 
     public void moveAway(){
         Vector moveVector = new Vector();
+        double speed = sprak.normalVelocity.getMagnitude();
+
         for (Map.Entry<String, EnemyRobot> robotEntry : sprak.enemyRobots.entrySet()) {
             //todo: more fleshed out algorithm to weigh moveVector.
-            Point robotEstimatedPosition = robotEntry.getValue().estimatedPosition(sprak.getTime());
+            Point enemyPosition = robotEntry.getValue().estimatedPosition(sprak.getTime());
 
-            double distanceFromRobot = robotEstimatedPosition.distanceToPoint(sprak.position);
+            double distanceFromRobot = enemyPosition.distanceToPoint(sprak.position);
             double angleFromRobot = new Vector().angleToPoint(new Point(
-                    sprak.getX()-robotEstimatedPosition.getX(),
-                    sprak.getY()-robotEstimatedPosition.getY())
+                    sprak.position.getX()-enemyPosition.getX(),
+                    sprak.position.getY()-enemyPosition.getY())
             ); //todo: make into operator? Point.angleToPoint(Point)?
 
-            Vector robotForce = new Vector(7*Math.sqrt(100/distanceFromRobot), angleFromRobot);
+            double finalAngle = Tools.shortestAngle(angleFromRobot-sprak.normalVelocity.getDirection());
+            Vector robotForce = new Vector(7*Math.sqrt(100/distanceFromRobot), finalAngle);
             moveVector = moveVector.add(robotForce);
         }
-        sprak.setTurnRate(Tools.convertAngle(Tools.shortestAngle(moveVector.getDirection()- sprak.normalVelocity.getDirection())));
-        sprak.setVelocityRate(8);
+        Vector maxMoveVector = getMaxVector(moveVector, speed);
+        move(maxMoveVector, speed);
     }
 
-    public Vector getMaxVector(Vector desiredVector){
-        double speed = sprak.normalVelocity.getMagnitude();
-        List<Function> limits = List.of(
-                new Function(FunctionType.X_ACC_LIMIT, speed, Math.min(8-speed,1)),
-                new Function(FunctionType.X_ACC_LIMIT, speed, Math.min(-1, Math.max(-speed,-2))),
+
+    public Vector getMaxVector(Vector vector, double speed){
+        Point targetPoint = toMoveVector(vector,speed).getFreeForm();
+
+
+        List<Function> functions = List.of(
+                new Function(FunctionType.X_ACC_LIMIT, speed, Math.min(2, Math.max(-speed,Math.min(1, -speed+8)))),
+                new Function(FunctionType.X_ACC_LIMIT, speed, Math.max(-8-speed,Math.min(-1,Math.max(-2, -speed)))),
                 new Function(FunctionType.Y_ACC_LIMIT, speed, 1),
                 new Function(FunctionType.Y_ACC_LIMIT, speed, -1)
         );
 
         double shortestDistance = -1;
-        Point closestPoint = new Point();
+        Point closestCandidatePoint = new Point();
 
-        for (Function function : limits) {
-            Point point = function.closestPoint(desiredVector.getFreeForm());
-            double distance = desiredVector.getFreeForm().distanceToPoint(point);
+        for (Function function : functions) {
+            Point candidatePoint = function.closestPoint(targetPoint);
+            double distance = targetPoint.distanceToPoint(candidatePoint);
 
             boolean isCloser = distance < shortestDistance;
             boolean withinLimits = true;
-            for (Function testFunction : limits) {
-                withinLimits = withinLimits && testFunction.withinFunction(point);
+            for (Function testFunction : functions) {
+                withinLimits = withinLimits && testFunction.withinFunction(candidatePoint);
             }
 
             if (withinLimits && (isCloser || shortestDistance == -1)) {
                 shortestDistance = distance;
-                closestPoint = point;
+                closestCandidatePoint = candidatePoint;
             }
         }
-        return new Vector(closestPoint);
+
+        return fromMoveVector(new Vector(closestCandidatePoint), sprak.normalVelocity.getMagnitude());
+    }
+
+    public void move(Vector vector, double speed){
+        Vector moveVector = toMoveVector(vector, speed);
+
+        if (moveVector.getDirection() < -90 || moveVector.getDirection() > 90){
+            sprak.setVelocityRate(-moveVector.getMagnitude());
+            sprak.setTurnRate(Tools.shortestAngle(-moveVector.getDirection()-180));
+        }else {
+            sprak.setVelocityRate(moveVector.getMagnitude());
+            sprak.setTurnRate(-moveVector.getDirection());
+        }
+    }
+
+    public Vector toMoveVector(Vector vector, double speed){
+        return vector.add(new Vector(speed, 0));
+    }
+
+    public Vector fromMoveVector(Vector vector, double speed){
+        return vector.subtract(new Vector(speed, 0));
     }
 }
