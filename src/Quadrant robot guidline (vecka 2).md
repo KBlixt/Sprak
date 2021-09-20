@@ -24,6 +24,6 @@ Robot skjuter
       e.	Prioriterat (överstyr): Robot rör sig mot och skjuter (skottstorlek 3) mot fiende som befinner sig utmed samma vågräta vägg. Om fiende dör, gå tillbaka till #3
 
 Sammanfattningsvis
-Rörelse (Haris): Se punkt 1-4
+Rörelse (Haris): Se punkt 1-4 & 5e
 Radar (Alfred): Se punkt 5
 Kanon (Karl): Se punkt 5
