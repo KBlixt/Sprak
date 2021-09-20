@@ -43,8 +43,8 @@ public class Vector {
 
     public void setVector(Vector vector){
         setVector(
-                vector.getDirection(),
-                vector.getMagnitude());
+                vector.getMagnitude(),
+                vector.getDirection());
     }
 
 
