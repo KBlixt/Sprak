@@ -127,8 +127,8 @@ public class Mover {
 
         wallPoints.add(new double[]{spark.status.getX(), 0}); // nordliga väggen
         wallPoints.add(new double[]{spark.status.getX(), spark.getBattleFieldHeight()}); // sydliga väggen
-        wallPoints.add(new double[]{0, spark.status.getY()}); // västra väggen
-        wallPoints.add(new double[]{spark.getBattleFieldWidth(), spark.status.getY()}); // östra väggen
+      //  wallPoints.add(new double[]{0, spark.status.getY()}); // västra väggen
+      //  wallPoints.add(new double[]{spark.getBattleFieldWidth(), spark.status.getY()}); // östra väggen
 
         return wallPoints;
     }
