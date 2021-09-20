@@ -50,11 +50,11 @@ public class Spark extends Robot {
                 turnRight(angleToClosestBot);
                 ahead(closestDistance - 100);
             } else if (closestDistance > 200) {
-                mover.moveToClosestRobot(50);
+                turnRight(angleToClosestBot);
+                ahead(closestDistance - 50);
             } else {
-                mover.doNotMove();
+                turnRight(angleToClosestBot);
             }
-
         }
     }
 
