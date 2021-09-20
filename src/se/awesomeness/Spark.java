@@ -42,7 +42,8 @@ public class Spark extends Robot {
                     angleToClosestBot = robotNames.get(i).getBearing();
                 }
             }
-            calculateFire(10);
+
+            calculateFire(closestDistance, angleToClosestBot);
 
             if (closestDistance > 350) {
                 turnRight(angleToClosestBot);
@@ -61,17 +62,16 @@ public class Spark extends Robot {
 
     }
 
-    public void calculateFire(double distanceToEnemy) {
+    public void calculateFire(double distanceToEnemy, double angleToTarget) {
+        turnGunRight(angleToTarget +(getHeading()-getGunHeading()));
         if(distanceToEnemy > 350) {
             fireBullet(1);
+        } else if (distanceToEnemy > 200){
+            fireBullet(2);
+        } else{
+            fireBullet(3);
         }
-            else if (distanceToEnemy < 200){
-                fireBullet(3);
-            }
-            else if (distanceToEnemy > 200){
-                fireBullet(2);
-            }
-        }
+    }
 
     @Override
     public void onStatus(StatusEvent e) {
