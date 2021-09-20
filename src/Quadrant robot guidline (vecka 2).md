@@ -25,5 +25,5 @@ Robot skjuter
 
 Sammanfattningsvis
 Rörelse (Haris): Se punkt 1-4 & 5e
-Radar (Alfred): Se punkt 5
+Radar (Albin): Se punkt 5
 Kanon (Karl): Se punkt 5
