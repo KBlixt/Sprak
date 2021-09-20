@@ -3,6 +3,7 @@ package se.awesomeness;
 import robocode.ScannedRobotEvent;
 
 import java.util.Map;
+import java.util.SortedMap;
 
 public class EnemyRobot {
 
@@ -33,7 +34,7 @@ public class EnemyRobot {
         position = sparkPosition.addVector(
                 new Vector(
                         scannedRobot.getDistance(),
-                        sparkHeading+Tools.convertAngle(scannedRobot.getBearing())
+                        sparkHeading-scannedRobot.getBearing()
                 )
         );
         Vector oldVelocity = velocity;
