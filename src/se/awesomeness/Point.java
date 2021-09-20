@@ -74,8 +74,8 @@ public class Point {
     }
 
     public double distanceToPoint(Point toPoint){
-        double deltaX = Math.abs(x - toPoint.x);
-        double deltaY = Math.abs(y - toPoint.y);
+        double deltaX = x - toPoint.x;
+        double deltaY = y - toPoint.y;
 
         return Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
     }
