@@ -30,8 +30,30 @@ public class Spark extends Robot {
 
         mover = new Mover(this);
         mover.moveToClosestWall(25);
-        turnRight(180);
-        turnRight(90);
+       // turnRight(180);
+
+        /*
+        double maxX = getBattleFieldWidth();
+        double maxY = getBattleFieldHeight();
+        double midX = maxX / 2;
+        double midY = maxY / 2;
+
+        double lowerLeftQuadrantLowerSideX = maxX * 0.25;
+        double lowerLeftQuadrantLowerSideY = maxY * 0;
+        double upperLeft
+
+
+        double[] getMidPoint = ge
+
+        double quadrantCenter = getBattleFieldWidth() * -0.25;
+
+
+        turnRight(quadrantCenter);
+
+         */
+
+
+       // turnRight(90);
         //noinspection InfiniteLoopStatement
         while (true) {
             calculateRadar();
@@ -47,7 +69,7 @@ public class Spark extends Robot {
                     angleToClosestBot = robotNames.get(i).getBearing();
                 }
             }
-            calculateMovement();
+           // calculateMovement();
 
 
             calculateFire(closestDistance, angleToClosestBot);
