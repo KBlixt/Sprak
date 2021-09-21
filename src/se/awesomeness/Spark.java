@@ -26,6 +26,8 @@ public class Spark extends Robot {
     int opponentsLeft;
 
     public void run() {
+
+
         mover = new Mover(this);
         mover.moveToClosestWall(25);
        // turnRight(180);
