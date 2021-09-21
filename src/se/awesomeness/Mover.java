@@ -1,12 +1,13 @@
 package se.awesomeness;
 
+import robocode.Robot;
 import robocode.ScannedRobotEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Mover {
+public class Mover extends Robot {
 
     Map<String, double[]> enemyPositions;
     Spark spark;
@@ -60,6 +61,36 @@ public class Mover {
 
         spark.turnRight(angleToClosestWall());
         spark.ahead(distanceToPoint(closestPoint[0], closestPoint[1]) - stopEarlyOffset);
+    }
+
+    public void moveToMidPointOfQuadrant() {
+
+        double maxX = getBattleFieldWidth();
+        double maxY = getBattleFieldHeight();
+        double midX = maxX / 2;
+        double midY = maxY / 2;
+
+        // Coordinates for each quadrant of the map.
+        // (0.25X,0Y)
+        double lowerLeftQuadrantSideX = maxX * 0.25;
+        double lowerLeftQuadrantSideY = maxY * 0;
+
+        // (0.25X,1Y)
+        double upperLeftQuadrantSideX = maxX * 0.25;
+        double upperLeftQuadrantSideY = maxY * 1;
+
+        // (0.75X,0Y)
+        double lowerRightQuadrantSideX = maxX * 0.75;
+        double lowerRightQuadrantSideY = maxY * 0;
+
+        // (0.75X,0Y)
+        double upperRightQuadrantSideX = maxX * 0.75;
+        double upperRightQuadrantSideY = maxY * 1;
+
+        // X & Y coordinates of spark.
+        spark.getX();
+        spark.getY();
+
     }
 
     /** Moves Spark nothing.
