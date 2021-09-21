@@ -26,45 +26,27 @@ public class Spark extends Robot {
     int opponentsLeft;
 
     public void run() {
-
-
         mover = new Mover(this);
         mover.moveToClosestWall(25);
-        turnRight(180);
-        turnRight(90);
+        turnRight(180); // vvvvvvvvv
+        turnRight(90); // turn left?
+
         //noinspection InfiniteLoopStatement
         while (true) {
             calculateRadar();
 
             opponentsLeft = getOthers();
-            String closestBotName = "";
             double closestDistance = 100_000_000;
             double angleToClosestBot = 0;
             for (int i = 0; i < robotNames.size(); i++) {
                 if (robotNames.get(i).getDistance() < closestDistance) {
                     closestDistance = robotNames.get(i).getDistance();
-                    closestBotName = robotNames.get(i).getName();
                     angleToClosestBot = robotNames.get(i).getBearing();
                 }
             }
             calculateMovement();
-
-
             calculateFire(closestDistance, angleToClosestBot);
 
-
-            /*
-            if (closestDistance > 350) {
-                turnRight(angleToClosestBot);
-                ahead(closestDistance - 100);
-            } else if (closestDistance > 200) {
-                turnRight(angleToClosestBot);
-                ahead(closestDistance - 50);
-            } else {
-                turnRight(angleToClosestBot);
-            }
-
-             */
         }
     }
 
@@ -73,12 +55,10 @@ public class Spark extends Robot {
         turnLeft(180);
         ahead(150);
         turnRight(180);
-
     }
 
     public void calculateRadar() {
         turnRadarRight(360);
-
     }
 
     public void calculateFire(double distanceToEnemy, double angleToTarget) {
@@ -101,7 +81,6 @@ public class Spark extends Robot {
     public void onScannedRobot(ScannedRobotEvent e) {
         mover.updateEnemyPosition(e);
 
-
         for (int i = 0; i < robotNames.size(); i++) {
             // IF e's name = first name inside robotNames.
             if (e.getName().equals(robotNames.get(i).getName())) {
@@ -111,18 +90,7 @@ public class Spark extends Robot {
                 robotNames.add(e);
                 return;
             }
-
         }
         robotNames.add(e);
-
-
-        /*
-        // Turns the gun towards our opponent.
-        turnGunRight(getHeading() - getGunHeading() + event.getBearing());
-        // Locks in on target, unless something closer gets inside the scanner sight.
-        scan();
-        resume();
-        */
     }
 }
-
