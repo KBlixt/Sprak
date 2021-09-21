@@ -46,12 +46,12 @@ public class Mover {
     }
 
 
-    public void move(Vector vector){
+    public void move(Vector forceVector){
         double speed = sprak.normalVelocity.getMagnitude();
         double heading = sprak.normalVelocity.getDirection();
 
-        vector = getMaxVector(vector);
-        Vector moveVector = toMoveVector(vector, speed , heading );
+        forceVector = MaxForceVector(forceVector);
+        Vector moveVector = toMoveVector(forceVector, speed , heading );
 
         if (moveVector.getDirection() < -90 || moveVector.getDirection() > 90){
             sprak.setVelocityRate(-moveVector.getMagnitude());
@@ -62,10 +62,10 @@ public class Mover {
         }
     }
 
-    public Vector getMaxVector(Vector vector){
+    public Vector MaxForceVector(Vector forceVector){
         double speed = sprak.normalVelocity.getMagnitude();
         double heading = sprak.normalVelocity.getDirection();
-        Point targetPoint = new Point(toMoveVector(vector, speed, heading));
+        Point targetPoint = new Point(toMoveVector(forceVector, speed, heading));
 
         double upperAccLimit = Math.min(2, Math.max(-speed,Math.min(1, -speed+8)));
         double lowerAccLimit = Math.max(-8-speed,Math.min(-1,Math.max(-2, -speed)));
@@ -99,16 +99,16 @@ public class Mover {
             candidatePoints.remove(candidatePoint);
         }
 
-        return fromMoveVector(new Vector(candidatePoint), speed, heading);
+        return toForceVector(new Vector(candidatePoint), speed, heading);
     }
 
-    public static Vector toMoveVector(Vector vector, double speed, double heading){
-        Vector moveVector = new Vector(vector.getMagnitude(), vector.getDirection() - heading);
+    public static Vector toMoveVector(Vector forceVector, double speed, double heading){
+        Vector moveVector = new Vector(forceVector.getMagnitude(), forceVector.getDirection() - heading);
         moveVector = moveVector.add(new Vector(speed,0));
         return moveVector;
     }
 
-    public static Vector fromMoveVector(Vector moveVector, double speed, double heading){
+    public static Vector toForceVector(Vector moveVector, double speed, double heading){
         Vector vector = moveVector.subtract(new Vector(speed,0));
         vector = new Vector(vector.getMagnitude(), vector.getDirection() + heading);
         return vector;

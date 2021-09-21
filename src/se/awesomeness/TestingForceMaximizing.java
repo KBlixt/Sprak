@@ -53,7 +53,7 @@ public class TestingForceMaximizing {
         }
 
         System.out.println(new Vector(candidatePoint));
-        candidatePoint = Mover.fromMoveVector(new Vector(candidatePoint), speed, heading).getFreeForm();
+        candidatePoint = Mover.toForceVector(new Vector(candidatePoint), speed, heading).getFreeForm();
 
         System.out.println(Mover.toMoveVector(new Vector(candidatePoint),speed,heading));
 /*
