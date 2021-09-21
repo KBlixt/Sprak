@@ -87,9 +87,7 @@ public class Mover extends Robot {
         double upperRightQuadrantSideX = maxX * 0.75;
         double upperRightQuadrantSideY = maxY * 1;
 
-        // X & Y coordinates of spark.
-        spark.getX();
-        spark.getY();
+
 
     }
 
