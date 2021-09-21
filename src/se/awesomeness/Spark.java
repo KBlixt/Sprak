@@ -64,7 +64,19 @@ public class Spark extends Robot {
     }
 
     public void calculateFire(double distanceToEnemy, double angleToTarget) {
-        turnGunRight(angleToTarget +(getHeading()-getGunHeading()));
+
+        double adjustAngle = angleToTarget +(getHeading()-getGunHeading());
+
+        // Följande kod reducerar vinkeln till den minsta ekvivalent vinkeln.
+        adjustAngle %= 360;
+        if (adjustAngle > 180){
+            adjustAngle -= 360;
+        } else if (adjustAngle < -180){
+            adjustAngle += 360;
+        }
+
+        //vrider oss och skjuter
+        turnGunRight(adjustAngle);
         if(distanceToEnemy < 200) {
             fireBullet(3);
         } else if (distanceToEnemy < 350 || opponentsLeft > 5) {
