@@ -65,9 +65,7 @@ public class Mover {
     public Vector getMaxVector(Vector vector){
         double speed = sprak.normalVelocity.getMagnitude();
         double heading = sprak.normalVelocity.getDirection();
-
         Point targetPoint = new Point(toMoveVector(vector, speed, heading));
-        List<Point> candidatePoints = new ArrayList<>();
 
         double upperAccLimit = Math.min(2, Math.max(-speed,Math.min(1, -speed+8)));
         double lowerAccLimit = Math.max(-8-speed,Math.min(-1,Math.max(-2, -speed)));
@@ -81,6 +79,7 @@ public class Mover {
                 new Limit(LimitType.TURN_LIMIT, rightTurnLimit, speed)
         );
 
+        List<Point> candidatePoints = new ArrayList<>();
         for (Limit limit : limits) {
             candidatePoints.add(limit.closestPoint(targetPoint));
         }
@@ -91,7 +90,6 @@ public class Mover {
 
         boolean withinLimits = false;
         Point candidatePoint = new Point();
-
         while(!withinLimits){
             withinLimits = true;
             candidatePoint = targetPoint.closestPoint(candidatePoints);
@@ -100,6 +98,7 @@ public class Mover {
             }
             candidatePoints.remove(candidatePoint);
         }
+
         return fromMoveVector(new Vector(candidatePoint), speed, heading);
     }
 
