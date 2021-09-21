@@ -1,5 +1,7 @@
 package se.awesomeness;
 
+import java.util.List;
+
 public class Vector {
 
     private double magnitude;
@@ -108,7 +110,7 @@ public class Vector {
         return "[vector]: (Magnitude: " + getMagnitude() + " , Direction: " + getDirection() + ")";
     }
 
-    public static Vector addAll(Vector[] vectors){
+    public static Vector addAll(List<Vector> vectors){
         Vector sumVector = new Vector();
         for (Vector vector : vectors) {
             sumVector = sumVector.add(vector);
