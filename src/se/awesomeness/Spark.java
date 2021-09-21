@@ -44,8 +44,10 @@ public class Spark extends Robot {
                     angleToClosestBot = robotNames.get(i).getBearing();
                 }
             }
-            calculateMovement();
+
             calculateFire(closestDistance, angleToClosestBot);
+            calculateMovement();
+
 
         }
     }
@@ -63,13 +65,18 @@ public class Spark extends Robot {
 
     public void calculateFire(double distanceToEnemy, double angleToTarget) {
         turnGunRight(angleToTarget +(getHeading()-getGunHeading()));
-        if(distanceToEnemy > 350) {
-            fireBullet(1);
-        } else if (distanceToEnemy > 200){
+        if(distanceToEnemy < 200) {
+            fireBullet(3);
+        } else if (distanceToEnemy < 350 || opponentsLeft > 5) {
             fireBullet(2);
         } else{
-            fireBullet(3);
+            fireBullet(1);
         }
+    }
+
+    public void overrideFire(double angleToTarget){
+        turnGunRight(angleToTarget +(getHeading()-getGunHeading()));
+        fireBullet(3);
     }
 
     @Override
