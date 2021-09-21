@@ -21,7 +21,7 @@ public class Sprak extends RateControlRobot {
         //noinspection InfiniteLoopStatement
         while (true){
             mover.UpdateThreats(getTime());
-            mover.moveAway();
+            mover.testMoving();
             execute();
         }
 
