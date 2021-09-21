@@ -20,4 +20,8 @@ public class Tools {
     public static double round(double number){
         return (double)Math.round(number*1_000_000)/1_000_000;
     }
+
+    public static double oppositeAngle(double angle){
+        return shortestAngle(angle-180);
+    }
 }
