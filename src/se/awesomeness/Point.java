@@ -16,6 +16,10 @@ public class Point {
         setPoint(point);
     }
 
+    public Point(Vector vector){
+        setPoint(vector);
+    }
+
     public Point(){
         x = 0;
         y = 0;
@@ -29,6 +33,10 @@ public class Point {
 
     public void setPoint(Point point){
         setPoint(point.getX(), point.getY());
+    }
+
+    public void setPoint(Vector vector){
+        setPoint(vector.getFreeForm());
     }
 
 
