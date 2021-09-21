@@ -16,7 +16,7 @@ public class Sprak extends RateControlRobot {
 
     public void run(){
         enemyRobots = new HashMap<>();
-        ThreatBasedMovement mover = new ThreatBasedMovement(this);
+        Mover mover = new Mover(this);
         setRadarRotationRate(45);
         //noinspection InfiniteLoopStatement
         while (true){

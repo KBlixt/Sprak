@@ -1,147 +1,117 @@
 package se.awesomeness;
 
-import robocode.Robot;
-import robocode.ScannedRobotEvent;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Mover extends Robot {
+public class Mover {
 
-    Map<String, double[]> enemyPositions;
-    Spark spark;
+        Sprak sprak;
 
-    /**
-     * Creates a mover object that can move Spark.
-     *
-     * @param spark the Spark to move.
-     */
-    public Mover(Spark spark) {
-        enemyPositions = new HashMap<>();
-        this.spark = spark;
+    public Mover(Sprak sprak) {
+        this.sprak = sprak;
     }
 
-    /**
-     * Moves Spark to the closest Wall, stops <stopEarlyOffset> pixels early.
-     *
-     * @param stopEarlyOffset pixels to stop early.
-     */
-    public void moveToClosestWall(double stopEarlyOffset) {
-
-        ArrayList<double[]> wallPoints = generateWallPoints();
-        double[] closestPoint = wallPoints.get(closestPoint(wallPoints));
-
-        spark.turnRight(angleToClosestWall());
-        spark.ahead(distanceToPoint(closestPoint[0], closestPoint[1]) - stopEarlyOffset);
-    }
-
-    public void moveToMidPointOfQuadrant() {
-
-        double maxX = spark.getBattleFieldWidth();
-        double maxY = spark.getBattleFieldHeight();
-        double midX = maxX / 2;
-        double midY = maxY / 2;
-
-        // X-coordinates to compare which side of the quadrant Sprak's on.
-        double lowX = maxX * 0.25; // LOW X
-        double highX = maxX * 0.75; // HIGH X
-
-        // Sparks position.
-        double sparkX = spark.getX();
-        double sparkY = spark.getY();
-
-        boolean isTopSide = sparkY > midY;
-        boolean isRightSide = sparkX > midX;
-
-
-        // Upper right quadrant.
-        if (isTopSide && isRightSide) {
-            // IF right side of the quadrant, turn left.
-            if (sparkX >= highX) {
-                spark.turnLeft(90);
-            } else {
-                spark.turnRight(90);
-            }
-
-            // Lower right quadrant.
-        } else if (!isTopSide && isRightSide) {
-            if (sparkX >= highX) {
-                spark.turnRight(90);
-            } else {
-                spark.turnLeft(90);
-            }
-
-            // Upper left quadrant.
-        } else if (isTopSide) {
-            if (sparkX <= lowX) {
-                spark.turnRight(90);
-            } else {
-                spark.turnLeft(90);
-            }
-            // Lower left quadrant.
-        } else {
-            if (sparkX <= lowX) {
-                spark.turnLeft(90);
-            } else {
-                spark.turnRight(90);
-            }
+    public void UpdateThreats(long time){
+        for (Map.Entry<String, EnemyRobot> robotEntry : sprak.enemyRobots.entrySet()) {
+            robotEntry.getValue().updateThreatDistance(sprak.enemyRobots, time);
         }
+    }
 
+    public void testMoving(){
+        double speed = sprak.normalVelocity.getMagnitude();
+        double heading = sprak.normalVelocity.getDirection();
+        List<Vector> forces = new ArrayList<>();
+        System.out.println("[-------------------------------------]");
+        System.out.println("speed: " + speed);
+        System.out.println("heading: " + heading);
+        forces.add( new Vector(3, 90));
+        forces.add(new Vector(-4, 0.2));
+        forces.add(new Vector(8, -45));
+
+        move(Vector.addAll(forces));
+    }
+
+    
+    public void addWallForces(List<Vector> forces){
+        double sprakX = sprak.position.getX();
+        double sprakY = sprak.position.getY();
+        double maxX = sprak.getBattleFieldWidth();
+        double maxY =sprak.getBattleFieldHeight();
+
+        Point top = new Point(sprakX, maxY);
+        Point bott = new Point(sprakX, 0);
+        Point left = new Point(0, sprakY);
+        Point right = new Point(maxX, sprakY);
     }
 
 
-    private double angleToClosestWall() {
-        ArrayList<double[]> wallPoints = generateWallPoints();
-        double angleToWall = 1;
-        switch (closestPoint(wallPoints)) {
-            case 0 -> angleToWall = 180;
-            case 1 -> angleToWall = 0;
-            case 2 -> angleToWall = -90;
-            case 3 -> angleToWall = 90;
+    public void move(Vector vector){
+        double speed = sprak.normalVelocity.getMagnitude();
+        double heading = sprak.normalVelocity.getDirection();
+
+        vector = getMaxVector(vector);
+        Vector moveVector = toMoveVector(vector, speed , heading );
+
+        if (moveVector.getDirection() < -90 || moveVector.getDirection() > 90){
+            sprak.setVelocityRate(-moveVector.getMagnitude());
+            sprak.setTurnRate(Tools.shortestAngle(-moveVector.getDirection()-180));
+        }else {
+            sprak.setVelocityRate(moveVector.getMagnitude());
+            sprak.setTurnRate(-moveVector.getDirection());
         }
-        angleToWall = angleToWall - spark.status.getHeading();
-        if (angleToWall > 180) {
-            angleToWall = angleToWall - 360;
-        } else if (angleToWall < -180) {
-            angleToWall = angleToWall + 360;
+    }
+
+    public Vector getMaxVector(Vector vector){
+        double speed = sprak.normalVelocity.getMagnitude();
+        double heading = sprak.normalVelocity.getDirection();
+
+        Point targetPoint = new Point(toMoveVector(vector, speed, heading));
+        List<Point> candidatePoints = new ArrayList<>();
+
+        double upperAccLimit = Math.min(2, Math.max(-speed,Math.min(1, -speed+8)));
+        double lowerAccLimit = Math.max(-8-speed,Math.min(-1,Math.max(-2, -speed)));
+        double leftTurnLimit = 10 - 0.75 * Math.abs(speed);
+        double rightTurnLimit = -leftTurnLimit;
+
+        List<Limit> limits = List.of(
+                new Limit(LimitType.ACCELERATION_LIMIT, upperAccLimit, speed),
+                new Limit(LimitType.ACCELERATION_LIMIT, lowerAccLimit, speed),
+                new Limit(LimitType.TURN_LIMIT, leftTurnLimit, speed),
+                new Limit(LimitType.TURN_LIMIT, rightTurnLimit, speed)
+        );
+
+        for (Limit limit : limits) {
+            candidatePoints.add(limit.closestPoint(targetPoint));
         }
-        return angleToWall;
-    }
+        candidatePoints.add(new Point(new Vector(speed +upperAccLimit,leftTurnLimit)));
+        candidatePoints.add(new Point(new Vector(speed +lowerAccLimit,leftTurnLimit)));
+        candidatePoints.add(new Point(new Vector(speed +upperAccLimit,rightTurnLimit)));
+        candidatePoints.add(new Point(new Vector(speed +lowerAccLimit,rightTurnLimit)));
 
-    private double distanceToPoint(double toX, double toY) {
-        return Math.sqrt(Math.pow(toX - spark.status.getX(), 2) + Math.pow(toY - spark.status.getY(), 2));
-    }
+        boolean withinLimits = false;
+        Point candidatePoint = new Point();
 
-    private int closestPoint(List<double[]> points) {
-        int closestPointIndex = 0;
-
-        double shortestDistance = Math.sqrt(Math.pow(
-                points.get(closestPointIndex)[0] - spark.status.getX(), 2)
-                + Math.pow(points.get(closestPointIndex)[1] - spark.status.getY(), 2));
-
-        double distance;
-        for (int i = 1; i < points.size(); i++) {
-
-            distance = Math.sqrt(Math.pow(
-                    points.get(i)[0] - spark.status.getX(), 2)
-                    + Math.pow(points.get(i)[1] - spark.status.getY(), 2));
-
-            if (distance < shortestDistance) {
-                closestPointIndex = i;
-                shortestDistance = distance;
+        while(!withinLimits){
+            withinLimits = true;
+            candidatePoint = targetPoint.closestPoint(candidatePoints);
+            for (Limit limit : limits) {
+                withinLimits &= limit.withinLimit(candidatePoint);
             }
+            candidatePoints.remove(candidatePoint);
         }
-        return closestPointIndex;
+        return fromMoveVector(new Vector(candidatePoint), speed, heading);
     }
 
-    private ArrayList<double[]> generateWallPoints() {
-        ArrayList<double[]> wallPoints = new ArrayList<>();
+    public static Vector toMoveVector(Vector vector, double speed, double heading){
+        Vector moveVector = new Vector(vector.getMagnitude(), vector.getDirection() - heading);
+        moveVector = moveVector.add(new Vector(speed,0));
+        return moveVector;
+    }
 
-        wallPoints.add(new double[]{spark.status.getX(), 0}); // nordliga väggen
-        wallPoints.add(new double[]{spark.status.getX(), spark.getBattleFieldHeight()}); // sydliga väggen
-
-        return wallPoints;
+    public static Vector fromMoveVector(Vector moveVector, double speed, double heading){
+        Vector vector = moveVector.subtract(new Vector(speed,0));
+        vector = new Vector(vector.getMagnitude(), vector.getDirection() + heading);
+        return vector;
     }
 }
