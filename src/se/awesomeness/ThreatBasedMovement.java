@@ -83,7 +83,7 @@ public class ThreatBasedMovement {
         }
 
         System.out.println("result: " + new Vector(candidatePoint));
-        return fromMoveVector(new Vector(candidatePoint), sprak.normalVelocity.getMagnitude());
+        return fromMoveVector(new Vector(candidatePoint), speed);
     }
 
     public void move(Vector vector, double speed){
