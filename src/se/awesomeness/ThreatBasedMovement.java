@@ -77,7 +77,7 @@ public class ThreatBasedMovement {
             withinLimits = true;
             candidatePoint = targetPoint.closestPoint(candidatePoints);
             for (Limit limit : limits) {
-                withinLimits &= limit.withinFunction(candidatePoint);
+                withinLimits &= limit.withinLimit(candidatePoint);
             }
             candidatePoints.remove(candidatePoint);
         }

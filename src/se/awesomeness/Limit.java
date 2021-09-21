@@ -25,7 +25,7 @@ public record Limit(LimitType type, double limit, double speed) {
         return closestPoint;
     }
 
-    public boolean withinFunction(Point point) {
+    public boolean withinLimit(Point point) {
         Vector pointVector = new Vector(point);
         double magnitude = pointVector.getMagnitude();
         double direction = pointVector.getDirection();
