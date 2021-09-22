@@ -1,6 +1,8 @@
 package se.awesomeness;
 
 public enum LimitType {
-    TURN_LIMIT,
-    ACCELERATION_LIMIT
+    TURN_RIGHT_LIMIT,
+    TURN_LEFT_LIMIT,
+    DECELERATE_LIMIT,
+    ACCELERATE_LIMIT
 }
