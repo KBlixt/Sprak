@@ -7,7 +7,9 @@ import robocode.StatusEvent;
 import robocode.ScannedRobotEvent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Spark extends Robot {
 
@@ -18,6 +20,7 @@ public class Spark extends Robot {
 
     // List to keep track of robotNames.
     List<ScannedRobotEvent> robotNames = new ArrayList<>();
+    Map<Double, Double> botDistanceAndBearing = new HashMap<>();
 
     // mover som flyttar på Spark.
     Mover mover;
@@ -131,6 +134,11 @@ public class Spark extends Robot {
                 return;
             }
         }
-        robotNames.add(e);
+        {
+            //Gets all bots Distance and bearing
+            botDistanceAndBearing.put(e.getDistance(), e.getBearing());
+            Double distAndBear = botDistanceAndBearing.get(e.getDistance() + e.getBearing());
+        }
+            robotNames.add(e);
     }
 }
