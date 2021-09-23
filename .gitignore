@@ -183,3 +183,4 @@ $RECYCLE.BIN/
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/inspectionProfiles/Project_Default.xml
 /src/se/awesomeness/testing*.java
+/src/se/awesomeness/Testing*.java
