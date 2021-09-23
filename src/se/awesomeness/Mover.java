@@ -12,7 +12,7 @@ public class Mover {
         this.sprak = sprak;
     }
 
-    public void testMoving(){
+    public Vector testMoving(){
         double speed = sprak.normalVelocity.getMagnitude();
         double heading = sprak.normalVelocity.getDirection();
         List<Vector> forces = new ArrayList<>();
@@ -34,11 +34,11 @@ public class Mover {
         Vector forceAfterWall = wallSurfing(forceSum, wallBuffer);
         System.out.println("forceAfterWall: " + forceAfterWall);
 
-        move(forceAfterWall);
+        return move(forceAfterWall);
     }
 
     
-    public Vector wallSurfing(Vector force, double wallOffset){
+    private Vector wallSurfing(Vector force, double wallOffset){
         double magnitude = force.getMagnitude();
         Point position = sprak.position;
 
@@ -113,14 +113,14 @@ public class Mover {
         return force;
     }
 
-    public void expandForce(Vector force, double targetMagnitude){
+    private void expandForce(Vector force, double targetMagnitude){
         if (force.getMagnitude() < 0){
             force = force.negative();
         }
         force.setVector(targetMagnitude, force.getDirection()); //118 safe in 90degree turns at speed 8.
     }
 
-    public void move(Vector force){
+    private Vector move(Vector force){
         double speed = sprak.normalVelocity.getMagnitude();
         double heading = sprak.normalVelocity.getDirection();
         if (force.getMagnitude() < 0){
@@ -190,5 +190,6 @@ public class Mover {
             sprak.setVelocityRate(moveVector.getMagnitude());
             sprak.setTurnRate(-moveVector.getDirection());
         }
+        return moveVector;
     }
 }

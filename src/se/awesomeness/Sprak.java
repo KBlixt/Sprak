@@ -17,12 +17,18 @@ public class Sprak extends RateControlRobot {
     public void run(){
         enemyRobots = new HashMap<>();
         Mover mover = new Mover(this);
+        Shooter shooter = new Shooter(this);
         setRadarRotationRate(45);
+        Vector nextMovement;
         //noinspection InfiniteLoopStatement
         while (true){
 
             UpdateThreats(getTime());
-            mover.testMoving();
+            nextMovement = mover.testMoving();
+            shooter.prepareShot();
+            if (shooter.canFire()){
+                shooter.fire(nextMovement);
+            }
             execute();
         }
 
