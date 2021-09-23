@@ -12,12 +12,6 @@ public class Mover {
         this.sprak = sprak;
     }
 
-    public void UpdateThreats(long time){
-        for (Map.Entry<String, EnemyRobot> robotEntry : sprak.enemyRobots.entrySet()) {
-            robotEntry.getValue().updateThreatDistance(sprak.enemyRobots, time);
-        }
-    }
-
     public void testMoving(){
         double speed = sprak.normalVelocity.getMagnitude();
         double heading = sprak.normalVelocity.getDirection();

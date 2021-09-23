@@ -20,11 +20,18 @@ public class Sprak extends RateControlRobot {
         setRadarRotationRate(45);
         //noinspection InfiniteLoopStatement
         while (true){
-            mover.UpdateThreats(getTime());
+
+            UpdateThreats(getTime());
             mover.testMoving();
             execute();
         }
 
+    }
+
+    public void UpdateThreats(long time){
+        for (Map.Entry<String, EnemyRobot> robotEntry : enemyRobots.entrySet()) {
+            robotEntry.getValue().updateThreatDistance(enemyRobots, time);
+        }
     }
 
     @Override
