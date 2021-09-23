@@ -15,9 +15,6 @@ public class Spark extends Robot {
 
     RobotStatus status;
 
-    // Variables to track distance & name of enemy robots.
-
-
     // List to keep track of robotNames.
     List<ScannedRobotEvent> robotNames = new ArrayList<>();
     Map<Double, Double> botDistanceAndBearing = new HashMap<>();
@@ -31,30 +28,9 @@ public class Spark extends Robot {
     public void run() {
         mover = new Mover(this);
         mover.moveToClosestWall(25);
-       // turnRight(180);
+        mover.moveToMidPointOfQuadrant();
+        //  turnLeft(90);
 
-        /*
-        double maxX = getBattleFieldWidth();
-        double maxY = getBattleFieldHeight();
-        double midX = maxX / 2;
-        double midY = maxY / 2;
-
-        double lowerLeftQuadrantLowerSideX = maxX * 0.25;
-        double lowerLeftQuadrantLowerSideY = maxY * 0;
-        double upperLeft
-
-
-        double[] getMidPoint = ge
-
-        double quadrantCenter = getBattleFieldWidth() * -0.25;
-
-
-        turnRight(quadrantCenter);
-
-         */
-
-
-       // turnRight(90);
         //noinspection InfiniteLoopStatement
         while (true) {
             calculateRadar();
@@ -77,10 +53,8 @@ public class Spark extends Robot {
     }
 
     public void calculateMovement() {
-        ahead(150);
-        turnLeft(180);
-        ahead(150);
-        turnRight(180);
+        ahead(100);
+        back(100);
     }
 
     public void calculateRadar() {
@@ -89,29 +63,29 @@ public class Spark extends Robot {
 
     public void calculateFire(double distanceToEnemy, double angleToTarget) {
 
-        double adjustAngle = angleToTarget +(getHeading()-getGunHeading());
+        double adjustAngle = angleToTarget + (getHeading() - getGunHeading());
 
         // Följande kod reducerar vinkeln till den minsta ekvivalent vinkeln.
         adjustAngle %= 360;
-        if (adjustAngle > 180){
+        if (adjustAngle > 180) {
             adjustAngle -= 360;
-        } else if (adjustAngle < -180){
+        } else if (adjustAngle < -180) {
             adjustAngle += 360;
         }
 
         //vrider oss och skjuter
         turnGunRight(adjustAngle);
-        if(distanceToEnemy < 200) {
+        if (distanceToEnemy < 200) {
             fireBullet(3);
         } else if (distanceToEnemy < 350 || opponentsLeft > 5) {
             fireBullet(2);
-        } else{
+        } else {
             fireBullet(1);
         }
     }
 
-    public void overrideFire(double angleToTarget){
-        turnGunRight(angleToTarget +(getHeading()-getGunHeading()));
+    public void overrideFire(double angleToTarget) {
+        turnGunRight(angleToTarget + (getHeading() - getGunHeading()));
         fireBullet(3);
     }
 
@@ -139,6 +113,6 @@ public class Spark extends Robot {
             botDistanceAndBearing.put(e.getDistance(), e.getBearing());
             Double distAndBear = botDistanceAndBearing.get(e.getDistance() + e.getBearing());
         }
-            robotNames.add(e);
+        robotNames.add(e);
     }
 }
