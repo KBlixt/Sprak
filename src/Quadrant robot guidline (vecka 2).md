@@ -13,7 +13,7 @@ Robot åker fram och tillbaka (i X-led)
 3. Gå i X-led: Robot åker till mitten av aktuell kvadrant,
 
 
-4.	Loopa beteende: Robot rör sig 100 pixel höger, 100 pixel vänster
+4.	Loopa beteende: Robot rör sig 200 pixel höger, 200 pixel vänster
 
 Robot skjuter
 5. Robot skott: Robot skjuter mot närmsta fiende
@@ -23,6 +23,8 @@ Robot skjuter
       d.	(om avstånd > 350 pixels & om 1-5 robotar skottstorlek 1)
       e.	Prioriterat (överstyr): Robot prioriterar fiender på avstånd < 150 pixels, 
 5.e forts. när robot står vid vågrätt vägg och vinkel mellan robot och fiende är mindre än 26°, multiplicera fiendens avstånd med 0.25. Skjut med skottstorlek 3. 
+
+5.f Robot skjuter mot fiender efter varje rörelse i sidled (höger-skott, vänster-skott)
 
 6. Om fiende dör, gå tillbaka till #3
    
