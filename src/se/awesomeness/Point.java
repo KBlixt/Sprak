@@ -81,6 +81,28 @@ public class Point {
         return points.get(closestPointIndex);
     }
 
+    public Point furthestPoint(List<Point> points){
+        int furthestPointIndex = 0;
+
+        double shortestDistance = Math.sqrt(Math.pow(
+                points.get(furthestPointIndex).x - x,2)
+                + Math.pow(points.get(furthestPointIndex).y - y,2));
+
+        double distance;
+        for ( int i = 1; i < points.size(); i++){
+
+            distance = Math.sqrt(Math.pow(
+                    points.get(i).x - x,2)
+                    + Math.pow(points.get(i).y - y,2));
+
+            if (distance > shortestDistance){
+                furthestPointIndex = i;
+                shortestDistance = distance;
+            }
+        }
+        return points.get(furthestPointIndex);
+    }
+
     public double distanceToPoint(Point toPoint){
         double deltaX = x - toPoint.x;
         double deltaY = y - toPoint.y;
