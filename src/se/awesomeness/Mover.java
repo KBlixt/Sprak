@@ -25,24 +25,89 @@ public class Mover {
         System.out.println("[-------------------------------------]");
         System.out.println("speed: " + speed);
         System.out.println("heading: " + heading);
-        forces.add( new Vector(3, 90));
-        forces.add(new Vector(-4, 0.2));
-        forces.add(new Vector(8, -45));
+        forces.add(sprak.normalVelocity);
+        forces.add(new Vector(9,45));
 
-        move(Vector.addAll(forces));
+
+        Vector forceSum = Vector.addAll(forces);
+        System.out.println("forceSum: " + forceSum);
+
+        expandForce(forceSum);
+        System.out.println("forceSum after exp: " + forceSum);
+
+        Vector forceAfterWall = wallSurfing(forceSum);
+        System.out.println("forceAfterWall: " + forceAfterWall);
+        move(forceAfterWall);
     }
 
     
-    public void addWallForces(List<Vector> forces){
-        double sprakX = sprak.position.getX();
-        double sprakY = sprak.position.getY();
-        double maxX = sprak.getBattleFieldWidth();
-        double maxY =sprak.getBattleFieldHeight();
+    public Vector wallSurfing(Vector force){
+        double magnitude = force.getMagnitude();
+        double wallOffset = 2;
+        Point position = new Point(
+                sprak.position.getX(),
+                sprak.position.getY());
+        System.out.println("position: " + sprak.position);
+        System.out.println("positionInternal: " + position);
+        double sprakX = position.getX();
+        double sprakY = position.getY();
+        double minX = 18+wallOffset;
+        double minY = 18+wallOffset;
+        double maxX = sprak.getBattleFieldWidth() - 18-wallOffset;
+        double maxY = sprak.getBattleFieldHeight() - 18-wallOffset;
 
-        Point top = new Point(sprakX, maxY);
-        Point bott = new Point(sprakX, 0);
-        Point left = new Point(0, sprakY);
-        Point right = new Point(maxX, sprakY);
+        double distToWallX;
+        if (maxX - sprakX < Math.abs(minX- sprakX)){
+            distToWallX = maxX - sprakX;
+        }else{
+            distToWallX = minX - sprakX;
+        }
+        double distToWallY;
+        if (maxY - sprakY < Math.abs(minY - sprakY)){
+            distToWallY = maxY - sprakY;
+        }else{
+            distToWallY = minY - sprakY;
+        }
+        System.out.println(distToWallY);
+        List<Point> pointsOnWall = new ArrayList<>();
+
+        pointsOnWall.add(force.getFreeForm());
+        if (Math.abs(distToWallX) < magnitude) {
+            pointsOnWall.add(new Point(distToWallX, magnitude*Math.sqrt(1-(distToWallX/magnitude))));
+            pointsOnWall.add(new Point(distToWallX, -magnitude*Math.sqrt(1-(distToWallX/magnitude))));
+        }
+        if (Math.abs(distToWallY) < magnitude){
+            System.out.println("magnitude: " + magnitude);
+            pointsOnWall.add(new Point(magnitude*Math.sqrt(1-(distToWallY/magnitude)), distToWallY));
+            pointsOnWall.add(new Point(-magnitude*Math.sqrt(1-(distToWallY/magnitude)), distToWallY));
+        }
+        System.out.println(pointsOnWall);
+        if (pointsOnWall.isEmpty()){
+            return force;
+        }
+
+        boolean withinLimits = false;
+        Point candidatePoint = new Point();
+        while (!withinLimits) {
+            candidatePoint = force.getFreeForm().closestPoint(pointsOnWall);
+            pointsOnWall.remove(candidatePoint);
+            Point checker = sprak.position.addVector(new Vector(candidatePoint));
+            double margin = 1;
+            boolean insideX = checker.getX()  - margin<= maxX && checker.getX() + margin>= minX;
+            boolean insideY = checker.getY() - margin<= maxY && checker.getY() + margin>= minY;
+
+           withinLimits = insideX && insideY;
+        }
+        System.out.println("ooooooooooooooooooooooooooo");
+        force = new Vector(candidatePoint);
+        return force;
+    }
+
+    public void expandForce(Vector force){
+        if (force.getMagnitude() < 0){
+            force = force.negative();
+        }
+        force.setVector(150, force.getDirection());
     }
 
 
@@ -52,6 +117,7 @@ public class Mover {
 
         forceVector = MaxForceVector(forceVector);
         Vector moveVector = toMoveVector(forceVector, speed , heading );
+        System.out.println("MoveVector: " + moveVector);
 
         if (moveVector.getDirection() < -90 || moveVector.getDirection() > 90){
             sprak.setVelocityRate(-moveVector.getMagnitude());
@@ -73,10 +139,10 @@ public class Mover {
         double rightTurnLimit = -leftTurnLimit;
 
         List<Limit> limits = List.of(
-                new Limit(LimitType.ACCELERATION_LIMIT, upperAccLimit, speed),
-                new Limit(LimitType.ACCELERATION_LIMIT, lowerAccLimit, speed),
-                new Limit(LimitType.TURN_LIMIT, leftTurnLimit, speed),
-                new Limit(LimitType.TURN_LIMIT, rightTurnLimit, speed)
+                new Limit(LimitType.ACCELERATE_LIMIT, upperAccLimit + speed),
+                new Limit(LimitType.DECELERATE_LIMIT, lowerAccLimit + speed),
+                new Limit(LimitType.TURN_LEFT_LIMIT, leftTurnLimit),
+                new Limit(LimitType.TURN_RIGHT_LIMIT, rightTurnLimit)
         );
 
         List<Point> candidatePoints = new ArrayList<>();
