@@ -42,15 +42,21 @@ public class Spark extends Robot {
                 if (robotNames.get(i).getDistance() < closestDistance) {
                     closestDistance = robotNames.get(i).getDistance();
                     angleToClosestBot = robotNames.get(i).getBearing();
+
                 }
             }
 
+
             calculateFire();
-            calculateMovement();
+            ahead(200);
+            calculateFire();
+            back(200);
+
 
 
         }
     }
+
 
     public void calculateMovement() {
         ahead(100);
