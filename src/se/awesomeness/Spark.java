@@ -43,6 +43,7 @@ public class Spark extends Robot {
                     closestDistance = robotNames.get(i).getDistance();
                     angleToClosestBot = robotNames.get(i).getBearing();
 
+
                 }
             }
 
@@ -69,12 +70,6 @@ public class Spark extends Robot {
 
 
         }
-    }
-
-
-    public void calculateMovement() {
-        ahead(100);
-        back(100);
     }
 
     public void calculateRadar() {
@@ -128,11 +123,6 @@ public class Spark extends Robot {
                 return;
             }
         }
-
-            //Gets all bots Distance and bearing
-            //botDistanceAndBearing.put(e.getDistance(), e.getBearing());
-            //Double distAndBear = botDistanceAndBearing.get(e.getDistance() + e.getBearing());
-
         robotNames.add(e);
     }
 }
