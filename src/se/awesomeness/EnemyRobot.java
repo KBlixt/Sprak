@@ -3,13 +3,12 @@ package se.awesomeness;
 import robocode.ScannedRobotEvent;
 
 import java.util.Map;
-import java.util.SortedMap;
 
 public class EnemyRobot {
 
     private final String name;
     private double energy;
-    private long lastUpdateTime;
+    private long infoAge;
 
     private Point position;
     private Vector velocity;
@@ -40,13 +39,16 @@ public class EnemyRobot {
         Vector oldVelocity = velocity;
         velocity = new Vector(scannedRobot.getVelocity(), Tools.convertAngle(scannedRobot.getHeading()));
 
-        long timeDelta = scannedRobot.getTime() - lastUpdateTime;
+        long timeDelta = scannedRobot.getTime() - infoAge;
         acceleration = velocity.subtract(oldVelocity).divide(timeDelta);
 
-        lastUpdateTime = scannedRobot.getTime();
+        infoAge = 0;
 
     }
 
+    public void updateAge(){
+        infoAge++;
+    }
     public void updateThreatDistance(Map<String, EnemyRobot> enemyRobots,long time) {
         double shortestDistance = 600;
 
@@ -88,20 +90,34 @@ public class EnemyRobot {
         return threatDistanceSpeed;
     }
 
+    public Point getPosition(){
+        return position;
+    }
+
 
     public Point estimatedPosition(long time){
             return new Point(
-                    position.addVector(velocity.multiply(time - lastUpdateTime))
+                    position.addVector(velocity.multiply(infoAge + time))
             );
             // todo: adjust for acceleration?
-
     }
 
     public Vector estimatedVelocity(long time){
         Vector estimatedVelocity = new Vector(
-                velocity.add(acceleration.multiply(time - lastUpdateTime))
+                velocity.add(acceleration.multiply(infoAge + time))
         );
         estimatedVelocity.setVector(Math.max(8,estimatedVelocity.getMagnitude()), estimatedVelocity.getDirection());
         return estimatedVelocity;
+    }
+
+    public String toString(){
+        String out = "";
+        out += "Nme : " + name + "\n";
+        out += "Pos : " + position + "\n";
+        out += "Vel : " + velocity + "\n";
+        out += "Acc : " + acceleration + "\n";
+        out += "Upd : " + infoAge + "\n";
+        return out;
+
     }
 }
