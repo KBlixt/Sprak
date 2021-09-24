@@ -27,8 +27,8 @@ public class Mover {
         Vector forceSum = Vector.addAll(forces);
         System.out.println("forceSum: " + forceSum);
 
-        double lookAhead = 70;
-        double wallBuffer = 20;
+        double lookAhead = 90;
+        double wallBuffer = 25;
 
         expandForce(forceSum, lookAhead);
         Vector forceAfterWall = wallSurfing(forceSum, wallBuffer);
