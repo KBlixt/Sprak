@@ -94,16 +94,13 @@ public class Vector {
     }
 
     public double angleToPoint(Point toPoint){
-        Point freeForm = getFreeForm();
-        double absoluteAngle = Math.atan2(
-                toPoint.getY() - freeForm.getY(),
-                toPoint.getX() - freeForm.getX());
+        Vector toPointVector = new Vector(toPoint);
+        return angleToVector(toPointVector);
+    }
 
-        absoluteAngle = Math.toDegrees(absoluteAngle);
-
-        double angleToPoint = direction + absoluteAngle;
-
-        return Tools.shortestAngle(angleToPoint);
+    public double angleToVector(Vector toVector){
+        double angle = toVector.getDirection() - direction;
+        return Tools.shortestAngle(angle);
     }
 
     public String toString(){
