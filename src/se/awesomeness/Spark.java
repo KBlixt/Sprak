@@ -128,11 +128,11 @@ public class Spark extends Robot {
                 return;
             }
         }
-        {
+
             //Gets all bots Distance and bearing
             //botDistanceAndBearing.put(e.getDistance(), e.getBearing());
             //Double distAndBear = botDistanceAndBearing.get(e.getDistance() + e.getBearing());
-        }
+
         robotNames.add(e);
     }
 }
