@@ -1,6 +1,10 @@
 package se.awesomeness;
 
-import robocode.*;
+import robocode.Robot;
+import robocode.RobotStatus;
+import robocode.StatusEvent;
+
+import robocode.ScannedRobotEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,8 +17,7 @@ public class Spark extends Robot {
 
     // List to keep track of robotNames.
     List<ScannedRobotEvent> robotNames = new ArrayList<>();
-    Map<String, Double> botDistance = new HashMap<>();
-    Map<String, Double> botBearing = new HashMap<>();
+    Map<Double, Double> botDistanceAndBearing = new HashMap<>();
 
     // mover som flyttar på Spark.
     Mover mover;
@@ -126,26 +129,10 @@ public class Spark extends Robot {
             }
         }
 
-            //Removes robot from list to add new value
-            //Get robots Name(Key) and Distance(Value in a double),
-            botDistance.remove(e.getName());
-            botDistance.put(e.getName(), e.getDistance());
-
-            //Removes robot from list to add new value
-            //Get robots Name(Key) and Bearing(Value in a double),
-            botBearing.remove(e.getName());
-            botBearing.put(e.getName(), e.getBearing());
-
+            //Gets all bots Distance and bearing
+            //botDistanceAndBearing.put(e.getDistance(), e.getBearing());
+            //Double distAndBear = botDistanceAndBearing.get(e.getDistance() + e.getBearing());
 
         robotNames.add(e);
-    }
-
-
-    @Override
-    public void onRobotDeath(RobotDeathEvent event) {
-        super.onRobotDeath(event);
-        if (botDistance.containsKey(event.getName()));
-            botDistance.remove(event.getName()); //On enemy robot death, removes them from Map list
-
     }
 }
