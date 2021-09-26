@@ -58,10 +58,16 @@ public class Vector {
         return direction;
     }
 
+    public double getX(){
+        return magnitude * Math.cos(Math.toRadians(direction));
+    }
+
+    public double getY(){
+        return magnitude * Math.sin(Math.toRadians(direction));
+    }
+
     public Point getFreeForm() {
-        double x = magnitude * Math.cos(Math.toRadians(direction));
-        double y = magnitude * Math.sin(Math.toRadians(direction));
-        return new Point(x, y);
+        return new Point(getX(),getY());
     }
 
 
