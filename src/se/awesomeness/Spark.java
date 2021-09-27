@@ -111,9 +111,10 @@ public class Spark extends Robot {
         double heading = getHeading();
         double prioritizedAngle = 25;
 
-        for (Map.Entry<Double, Double> entry : botDistanceAndBearing.entrySet()) {
-            double distance = entry.getKey();
-            double bearing = entry.getValue();
+        for (Map.Entry<String, Double> entry : botDistance.entrySet()) {
+            double distance = entry.getValue();
+            String botName = entry.getKey();
+            double bearing = botBearing.get(botName);
             double absoluteAngle = reduceAngle(heading + bearing);
             boolean insideZoneRight = 90+prioritizedAngle > absoluteAngle && absoluteAngle > 90-prioritizedAngle;
             boolean insideZoneLeft =  270+prioritizedAngle > absoluteAngle && absoluteAngle > 270-prioritizedAngle;
