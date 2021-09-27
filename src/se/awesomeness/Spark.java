@@ -11,8 +11,8 @@ public class Spark extends Robot {
 
     RobotStatus status;
 
-    // List to keep track of robotNames.
-    List<ScannedRobotEvent> robotNames = new ArrayList<>();
+    // List to keep track of enemyRobots.
+    List<ScannedRobotEvent> enemyRobots = new ArrayList<>();
     Map<String, Double> botDistance = new HashMap<>();
     Map<String, Double> botBearing = new HashMap<>();
 
@@ -53,7 +53,7 @@ public class Spark extends Robot {
 
         opponentsLeft = getOthers();
         double closestDistance = 100_000_000;
-        for (ScannedRobotEvent robotName : robotNames) {
+        for (ScannedRobotEvent robotName : enemyRobots) {
             if (robotName.getDistance() < closestDistance) {
                 closestDistance = robotName.getDistance();
             }
@@ -132,16 +132,16 @@ public class Spark extends Robot {
     public void onScannedRobot(ScannedRobotEvent e) {
         mover.updateEnemyPosition(e);
 
-        for (int i = 0; i < robotNames.size(); i++) {
-            // IF e's name = first name inside robotNames.
-            if (e.getName().equals(robotNames.get(i).getName())) {
+        for (int i = 0; i < enemyRobots.size(); i++) {
+            // IF e's name = first name inside enemyRobots.
+            if (e.getName().equals(enemyRobots.get(i).getName())) {
 
                 // Removes old name from list and adds new.
-                robotNames.remove(i);
+                enemyRobots.remove(i);
                 break;
             }
         }
-        robotNames.add(e);
+        enemyRobots.add(e);
         //Removes robot from list to add new value
         //Get robots Name(Key) and Distance(Value in a double),
         botDistance.remove(e.getName());
