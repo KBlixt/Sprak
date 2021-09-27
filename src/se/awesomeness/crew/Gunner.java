@@ -1,4 +1,4 @@
-package se.awesomeness.operators;
+package se.awesomeness.crew;
 
 import se.awesomeness.EnemyRobot;
 import se.awesomeness.geometry.Point;
@@ -6,7 +6,7 @@ import se.awesomeness.geometry.Vector;
 
 import java.util.Map;
 
-public class Shooter {
+public class Gunner {
 
     private final Vector gunHeading;
     private final Map<String, EnemyRobot> enemyRobots;
@@ -21,7 +21,7 @@ public class Shooter {
 
 
 
-    public Shooter(Vector gunHeading, Map<String, EnemyRobot> enemyRobots) {
+    public Gunner(Vector gunHeading, Map<String, EnemyRobot> enemyRobots) {
         this.gunHeading = gunHeading;
         this.enemyRobots = enemyRobots;
     }

@@ -4,9 +4,9 @@ import robocode.*;
 import se.awesomeness.geometry.Point;
 import se.awesomeness.geometry.Tools;
 import se.awesomeness.geometry.Vector;
-import se.awesomeness.operators.Driver;
-import se.awesomeness.operators.RadarControl;
-import se.awesomeness.operators.Shooter;
+import se.awesomeness.crew.Driver;
+import se.awesomeness.crew.RadarOperator;
+import se.awesomeness.crew.Gunner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,8 +25,8 @@ public class Sprak extends RateControlRobot {
 
     //operators
     private Driver driver;
-    private Shooter shooter;
-    private RadarControl radarControl;
+    private Gunner turretOperator;
+    private RadarOperator radar;
 
     public void run(){
         startOfRoundAction();
@@ -37,9 +37,9 @@ public class Sprak extends RateControlRobot {
             driver.drive();
             nextPosition = driver.getNextPosition();
 
-            shooter.prepareShot(nextPosition, turnsToFire);
+            turretOperator.prepareShot(nextPosition, turnsToFire);
 
-            radarControl.monitor(turnsToFire);
+            radar.monitor(turnsToFire);
 
             cleanUp();
             execute();
@@ -59,12 +59,12 @@ public class Sprak extends RateControlRobot {
                 getBattleFieldHeight()
         );
 
-        shooter = new Shooter(
+        turretOperator = new Gunner(
                 gunHeading,
                 enemyRobots
         );
 
-        radarControl = new RadarControl(
+        radar = new RadarOperator(
         );
 
         setGunRotationRate(20);
@@ -130,10 +130,10 @@ public class Sprak extends RateControlRobot {
     public void execute(){
         setVelocityRate(driver.getNextSpeed());
         setTurnRate(driver.getNextTurn());
-        setGunRotationRate(shooter.getAdjustGunAngle());
-        setRadarRotationRate(radarControl.getNextRadarTurn());
-        if(shooter.getSetFire()){
-            setFire(shooter.getBulletPower());
+        setGunRotationRate(turretOperator.getAdjustGunAngle());
+        setRadarRotationRate(radar.getNextRadarTurn());
+        if(turretOperator.getSetFire()){
+            setFire(turretOperator.getBulletPower());
         }
         super.execute();
     }

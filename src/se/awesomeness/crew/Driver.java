@@ -1,4 +1,4 @@
-package se.awesomeness.operators;
+package se.awesomeness.crew;
 
 import se.awesomeness.geometry.*;
 

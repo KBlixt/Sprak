@@ -1,12 +1,12 @@
-package se.awesomeness.operators;
+package se.awesomeness.crew;
 
 import se.awesomeness.EnemyRobot;
 
-public class RadarControl {
+public class RadarOperator {
     private long nextAction;
     private double nextRadarTurn;
 
-    public RadarControl(){
+    public RadarOperator(){
         nextAction = 1;
     }
 
