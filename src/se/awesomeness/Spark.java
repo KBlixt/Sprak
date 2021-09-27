@@ -34,11 +34,9 @@ public class Spark extends Robot {
 
             opponentsLeft = getOthers();
             double closestDistance = 100_000_000;
-            double angleToClosestBot = 0;
             for (int i = 0; i < robotNames.size(); i++) {
                 if (robotNames.get(i).getDistance() < closestDistance) {
                     closestDistance = robotNames.get(i).getDistance();
-                    angleToClosestBot = robotNames.get(i).getBearing();
 
                 }
             }
@@ -51,11 +49,9 @@ public class Spark extends Robot {
 
             opponentsLeft = getOthers();
             closestDistance = 100_000_000;
-            angleToClosestBot = 0;
             for (int i = 0; i < robotNames.size(); i++) {
                 if (robotNames.get(i).getDistance() < closestDistance) {
                     closestDistance = robotNames.get(i).getDistance();
-                    angleToClosestBot = robotNames.get(i).getBearing();
 
                 }
             }
@@ -175,7 +171,7 @@ public class Spark extends Robot {
     @Override
     public void onRobotDeath(RobotDeathEvent event) {
         super.onRobotDeath(event);
-        if (botDistance.containsKey(event.getName()));
+
         botDistance.remove(event.getName()); //On enemy robot death, removes them from Map list
     }
 }
