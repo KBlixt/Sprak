@@ -52,10 +52,10 @@ public class Mover {
 
         double sprakX = position.getX();
         double sprakY = position.getY();
-        double minX = 19.5;
-        double minY = 19.5;
-        double maxX = wallWidth - 19.5;
-        double maxY = wallHeight - 19.5;
+        double minX = 18.5;
+        double minY = 18.5;
+        double maxX = wallWidth - 18.5;
+        double maxY = wallHeight - 18.5;
         double magnitude = 118;//calculateLookAhead((minX + maxX)/2, (minY+maxY)/2);
         force = new Vector(magnitude,force.getDirection());
 
