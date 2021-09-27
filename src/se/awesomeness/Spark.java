@@ -171,7 +171,7 @@ public class Spark extends Robot {
     @Override
     public void onRobotDeath(RobotDeathEvent event) {
         super.onRobotDeath(event);
-
-        botDistance.remove(event.getName()); //On enemy robot death, removes them from Map list
+        botBearing.remove(event.getName()); //On enemy robot death, removes botBearing from Map list
+        botDistance.remove(event.getName()); //On enemy robot death, removes botDistance from Map list
     }
 }
