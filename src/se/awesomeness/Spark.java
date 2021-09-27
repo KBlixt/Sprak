@@ -32,29 +32,10 @@ public class Spark extends Robot {
         while (true) {
             calculateRadar();
 
-            opponentsLeft = getOthers();
-            double closestDistance = 100_000_000;
-            for (int i = 0; i < robotNames.size(); i++) {
-                if (robotNames.get(i).getDistance() < closestDistance) {
-                    closestDistance = robotNames.get(i).getDistance();
-
-                }
-            }
-
-
             calculateFire();
             ahead(200);
 
             calculateRadar();
-
-            opponentsLeft = getOthers();
-            closestDistance = 100_000_000;
-            for (int i = 0; i < robotNames.size(); i++) {
-                if (robotNames.get(i).getDistance() < closestDistance) {
-                    closestDistance = robotNames.get(i).getDistance();
-
-                }
-            }
 
             calculateFire();
             back(200);
@@ -72,6 +53,14 @@ public class Spark extends Robot {
 
     public void calculateRadar() {
         turnRadarRight(360);
+
+        opponentsLeft = getOthers();
+        double closestDistance = 100_000_000;
+        for (int i = 0; i < robotNames.size(); i++) {
+            if (robotNames.get(i).getDistance() < closestDistance) {
+                closestDistance = robotNames.get(i).getDistance();
+            }
+        }
     }
 
     public void calculateFire() {
