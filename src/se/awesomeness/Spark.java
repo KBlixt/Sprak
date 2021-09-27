@@ -141,11 +141,6 @@ public class Spark extends Robot {
         return bulletPower;
     }
 
-    public void overrideFire(double angleToTarget) {
-        turnGunRight(angleToTarget + (getHeading() - getGunHeading()));
-        fireBullet(3);
-    }
-
     @Override
     public void onStatus(StatusEvent e) {
         status = e.getStatus();
