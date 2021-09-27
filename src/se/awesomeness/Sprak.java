@@ -5,49 +5,61 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class Sprak extends RateControlRobot {
 
     Point position = new Point();
     Vector normalVelocity = new Vector();
     Vector gunHeading = new Vector();
+    Vector nextMove = new Vector();
 
-    Map<String, EnemyRobot> enemyRobots;
+    long turnsToFire = 16;
+    EnemyRobot targetRobot;
+
+    Map<String, EnemyRobot> enemyRobots = new HashMap<>();
     List<String> deadRobots = new ArrayList<>();
+
+    Mover mover = new Mover(this);
+    Shooter shooter = new Shooter(this);
+    RadarControl radarControl = new RadarControl(this);
 
     public void run(){
         setAdjustGunForRobotTurn(true);
         setAdjustRadarForGunTurn(true);
-        enemyRobots = new HashMap<>();
-        Mover mover = new Mover(this);
-        Shooter shooter = new Shooter(this);
+
+        setGunRotationRate(20);
         setRadarRotationRate(45);
-        Vector nextMovement;
-        //noinspection InfiniteLoopStatement
-        while (true) {
-            UpdateThreats(getTime());
-            nextMovement = mover.testMoving();
-            double magnitude = mover.testMoving().getMagnitude();
-            double direction = nextMovement.getDirection() + normalVelocity.getDirection();
-            nextMovement = new Vector(magnitude, direction);
-            if (!enemyRobots.isEmpty()) {
-                shooter.prepareShot(nextMovement);
-                if (shooter.canFire()) {
-                    shooter.fire();
-                }
-            }
-            for (Map.Entry<String, EnemyRobot> entry : enemyRobots.entrySet()) {
-                entry.getValue().updateAge();
-            }
+        setTurnRate(10);
+        setVelocityRate(8);
+        while (enemyRobots.isEmpty()){
+            execute();
+        }
+
+        while (!enemyRobots.isEmpty()) {
+            mover.testMoving();
+            nextMove.setVector(mover.getNextMove());
+
+            shooter.prepareShot(nextMove);
+            targetRobot = shooter.getTargetRobot();
+
+            radarControl.defaultMonitoring(targetRobot);
+
+            cleanUp();
             execute();
 
         }
+
+        setVelocityRate(0);
+        setTurnRate(10);
+        setGunRotationRate(-20);
+        while(enemyRobots.isEmpty()){
+            execute();
+        }
     }
 
-    public void UpdateThreats(long time){
+    public void cleanUp(){
         for (Map.Entry<String, EnemyRobot> robotEntry : enemyRobots.entrySet()) {
-            robotEntry.getValue().updateThreatDistance(enemyRobots, time);
+            robotEntry.getValue().updateAge();
         }
     }
 
@@ -56,6 +68,10 @@ public class Sprak extends RateControlRobot {
         position.setPoint(getX(), getY());
         normalVelocity.setVector(getVelocity(), Tools.convertAngle(getHeading()));
         gunHeading.setVector(1,Tools.convertAngle(getGunHeading()));
+        turnsToFire = shooter.getTurnsToFire();
+        for (Map.Entry<String, EnemyRobot> robotEntry : enemyRobots.entrySet()) {
+            robotEntry.getValue().updateThreatDistance(enemyRobots);
+        }
         super.onStatus(event);
     }
 
