@@ -161,22 +161,20 @@ public class Spark extends Robot {
 
                 // Removes old name from list and adds new.
                 robotNames.remove(i);
-                robotNames.add(e);
-                return;
+                break;
             }
         }
+        robotNames.add(e);
         //Removes robot from list to add new value
         //Get robots Name(Key) and Distance(Value in a double),
         botDistance.remove(e.getName());
         botDistance.put(e.getName(), e.getDistance());
 
+
         //Removes robot from list to add new value
         //Get robots Name(Key) and Bearing(Value in a double),
         botBearing.remove(e.getName());
         botBearing.put(e.getName(), e.getBearing());
-
-
-        robotNames.add(e);
     }
 
     @Override
