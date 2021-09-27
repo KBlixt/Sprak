@@ -6,17 +6,20 @@ import java.util.List;
 public class Mover {
 
         Point position;
-        Point nextPosition;
         Vector velocity;
-        Vector nextMove;
+        Point nextPosition;
         double wallHeight;
         double wallWidth;
 
-    public Mover(Point position, Vector velocity, Point nextPosition, Vector nextMove, double wallWidth, double wallHeight) {
+        double nextSpeed;
+        double nextTurn;
+
+
+
+    public Mover(Point position, Vector velocity, double wallWidth, double wallHeight) {
         this.position = position;
         this.velocity = velocity;
-        this.nextPosition = nextPosition;
-        this.nextMove = nextMove;
+
         this.wallWidth = wallWidth;
         this.wallHeight = wallHeight;
     }
@@ -53,9 +56,8 @@ public class Mover {
         double minY = 19.5;
         double maxX = wallWidth - 19.5;
         double maxY = wallHeight - 19.5;
-        double magnitude = calculateLookAhead((minX + maxX)/2, (minY+maxY)/2);
+        double magnitude = 118;//calculateLookAhead((minX + maxX)/2, (minY+maxY)/2);
         force = new Vector(magnitude,force.getDirection());
-        System.out.println("magnitude: " + magnitude);
 
         double distToWallX;
         if (maxX - sprakX < Math.abs(minX- sprakX)){
@@ -73,13 +75,13 @@ public class Mover {
         List<Point> pointsOnWall = new ArrayList<>();
         if (Math.abs(distToWallX) < magnitude) {
             double y = magnitude*Math.sqrt(1-Math.pow(distToWallX/magnitude,2));
-            pointsOnWall.add(new Point(distToWallX, magnitude * y));
-            pointsOnWall.add(new Point(distToWallX, magnitude * -y));
+            pointsOnWall.add(new Point(distToWallX, y));
+            pointsOnWall.add(new Point(distToWallX, -y));
         }
         if (Math.abs(distToWallY) < magnitude){
-            double x = Math.sqrt(1-Math.pow(distToWallY/magnitude,2));
-            pointsOnWall.add(new Point(magnitude*x, distToWallY));
-            pointsOnWall.add(new Point(magnitude*-x, distToWallY));
+            double x = magnitude*Math.sqrt(1-Math.pow(distToWallY/magnitude,2));
+            pointsOnWall.add(new Point(x, distToWallY));
+            pointsOnWall.add(new Point(-x, distToWallY));
         }
         System.out.println(pointsOnWall);
         pointsOnWall.add(force.getPoint());
@@ -204,19 +206,29 @@ public class Mover {
             candidatePoints.remove(candidatePoint);
         }
         Vector moveVector = new Vector(candidatePoint);
-        System.out.println("moveVector: " + moveVector);
 
         if (moveVector.getDirection() < -90 || moveVector.getDirection() > 90){
-            nextMove.setVector(
-                    -moveVector.getMagnitude(),
-                    Tools.shortestAngle(-moveVector.getDirection()-180));
+            nextSpeed = -moveVector.getMagnitude();
+            nextTurn = Tools.shortestAngle(-moveVector.getDirection()-180);
         }else {
-            nextMove.setVector(
-                    moveVector.getMagnitude(),
-                    -moveVector.getDirection());
+            nextSpeed = moveVector.getMagnitude();
+            nextTurn = -moveVector.getDirection();
         }
         nextPosition = position.addVector(new Vector(
                 moveVector.getMagnitude(),
-                moveVector.getDirection() + velocity.getDirection()));
+                moveVector.getDirection() + velocity.getDirection()
+        ));
+    }
+
+    public Point getNextPosition() {
+        return nextPosition;
+    }
+
+    public double getNextSpeed() {
+        return nextSpeed;
+    }
+
+    public double getNextTurn() {
+        return nextTurn;
     }
 }

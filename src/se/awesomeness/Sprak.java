@@ -11,19 +11,18 @@ public class Sprak extends RateControlRobot {
     Point position = new Point();
     Vector normalVelocity = new Vector();
     Point nextPosition = new Point();
-    Vector nextMove = new Vector();
 
     Vector gunHeading = new Vector();
 
-    long turnsToFire = 16;
+    Integer turnsToFire = 16;
     EnemyRobot targetRobot;
 
     Map<String, EnemyRobot> enemyRobots = new HashMap<>();
     List<String> deadRobots = new ArrayList<>();
 
     Mover mover;
+    Shooter shooter;
 
-    Shooter shooter = new Shooter(this);
     RadarControl radarControl = new RadarControl(this);
 
     public void run(){
@@ -33,11 +32,14 @@ public class Sprak extends RateControlRobot {
         mover = new Mover(
                 position,
                 normalVelocity,
-                nextPosition,
-                nextMove,
                 getBattleFieldWidth(),
                 getBattleFieldHeight()
         );
+        shooter = new Shooter(
+                gunHeading,
+                nextPosition,
+                enemyRobots,
+                targetRobot);
 
         setGunRotationRate(20);
         setRadarRotationRate(45);
@@ -49,17 +51,20 @@ public class Sprak extends RateControlRobot {
 
         while (!enemyRobots.isEmpty()) {
             mover.testMoving();
-            setVelocityRate(nextMove.getMagnitude());
-            setTurnRate(nextMove.getDirection());
+            setVelocityRate(mover.getNextSpeed());
+            setTurnRate(mover.getNextTurn());
+            nextPosition.setPoint(mover.getNextPosition());
 
-            shooter.prepareShot(nextMove);
-            targetRobot = shooter.getTargetRobot();
+            shooter.prepareShot(turnsToFire);
+            setGunRotationRate(shooter.getAdjustGunAngle());
+            if(shooter.getSetFire()){
+                setFire(shooter.getBulletPower());
+            }
 
             radarControl.defaultMonitoring(targetRobot);
 
             cleanUp();
             execute();
-
         }
 
         setVelocityRate(0);
@@ -78,14 +83,15 @@ public class Sprak extends RateControlRobot {
 
     @Override
     public void onStatus(StatusEvent event) {
+        super.onStatus(event);
         position.setPoint(getX(), getY());
         normalVelocity.setVector(getVelocity(), Tools.convertAngle(getHeading()));
         gunHeading.setVector(1,Tools.convertAngle(getGunHeading()));
-        turnsToFire = shooter.getTurnsToFire();
+        turnsToFire = (int)Math.round(Math.ceil(getGunHeat()/0.1));
+        System.out.println("realTurnsToFire" + turnsToFire);
         for (Map.Entry<String, EnemyRobot> robotEntry : enemyRobots.entrySet()) {
             robotEntry.getValue().updateThreatDistance(enemyRobots);
         }
-        super.onStatus(event);
     }
 
     @Override

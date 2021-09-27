@@ -4,32 +4,40 @@ import java.util.Map;
 
 public class Shooter {
 
-    Sprak sprak;
-    long turnsToFire;
-    EnemyRobot targetRobot;
+    Vector gunHeading;
+    Point nextPosition;
+    Map<String, EnemyRobot> enemyRobots;
+    EnemyRobot target;
 
-    public Shooter(Sprak sprak) {
-        this.sprak = sprak;
+    int turnsToFire;
+
+    boolean setFire;
+    double adjustGunAngle;
+    double bulletPower;
+
+
+
+    public Shooter(Vector gunHeading, Point nextPosition, Map<String, EnemyRobot> enemyRobots, EnemyRobot target) {
+        this.gunHeading = gunHeading;
+        this.nextPosition = nextPosition;
+        this.enemyRobots = enemyRobots;
+        this.target = target;
     }
 
-    public void prepareShot(Vector moveVector){
-        turnsToFire = Math.round(Math.ceil(sprak.getGunHeat()/0.1));
-
-        targetRobot = sprak.enemyRobots.get(targetSelection());
-        double bulletPower = aim(moveVector);
-
-        if(canFire() && bulletPower >= 1 && targetRobot.getInfoAge() < 2){
-            sprak.setFire(bulletPower);
-        }
+    public void prepareShot(int turnsToFire){
+        this.turnsToFire = turnsToFire;
+        target = enemyRobots.get(targetSelection());
+        aim();
+        setFire = turnsToFire < 1 && bulletPower >= 1 && target.getInfoAge() < 2;
     }
 
     private String targetSelection(){
         String targetRobotName = "";
         double shortestDistance = -1;
 
-        for (Map.Entry<String, EnemyRobot> entry : sprak.enemyRobots.entrySet()) {
+        for (Map.Entry<String, EnemyRobot> entry : enemyRobots.entrySet()) {
             Point position = entry.getValue().estimatedPosition(turnsToFire);
-            double distance = sprak.position.distanceTo(position);
+            double distance = nextPosition.distanceTo(position);
             if ( distance < shortestDistance || shortestDistance == -1){
                 shortestDistance = distance;
                 targetRobotName = entry.getKey();
@@ -38,18 +46,18 @@ public class Shooter {
         return targetRobotName;
     }
 
-    private double aim(Vector moveVector){
-        Point sprakPosition = sprak.position.addVector(moveVector);
+    private void aim(){
         double timeToTargetLimit = 30;
 
-        Point targetPoint = targetRobot.getPosition();
-        double distance = sprakPosition.distanceTo(targetPoint);
+        Point targetPoint = target.getPosition();
+        double distance = nextPosition.distanceTo(targetPoint);
         double addedTime = turnsToFire + distance/11;
+
         double bulletSpeed = 11;
         int iter = 10;
         while(iter>0){
-            targetPoint = targetRobot.estimatedPosition(Math.round(addedTime));
-            double newDistance = sprakPosition.distanceTo(targetPoint);
+            targetPoint = target.estimatedPosition(Math.round(addedTime));
+            double newDistance = nextPosition.distanceTo(targetPoint);
             double addTimeToTarget = (newDistance-distance)/bulletSpeed;
             addedTime += addTimeToTarget;
             if (addedTime > timeToTargetLimit){
@@ -61,20 +69,19 @@ public class Shooter {
             distance = newDistance;
             iter--;
         }
-        Vector vectorToTarget = sprakPosition.vectorTo(targetPoint);
-        double angleToTarget = sprak.gunHeading.angleToVector(vectorToTarget);
-        sprak.setGunRotationRate(-angleToTarget);
-        return -(bulletSpeed-20)/3;
-    }
-    public boolean canFire(){
-        return turnsToFire <= 1;
+        Vector vectorToTarget = nextPosition.vectorTo(targetPoint);
+        double angleToTarget = gunHeading.angleToVector(vectorToTarget);
+        adjustGunAngle = -angleToTarget;
+        bulletPower = -(bulletSpeed-20)/3;
     }
 
-    public EnemyRobot getTargetRobot() {
-        return targetRobot;
+    public boolean getSetFire(){
+        return setFire;
     }
-
-    public long getTurnsToFire() {
-        return turnsToFire;
+    public double getAdjustGunAngle(){
+        return adjustGunAngle;
+    }
+    public double getBulletPower(){
+        return bulletPower;
     }
 }
