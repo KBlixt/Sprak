@@ -1,33 +1,26 @@
 package se.awesomeness;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class Shooter {
 
     Sprak sprak;
-    EnemyRobot currentTarget;
-    boolean hardTargetLock;
-    boolean softTargetLock;
     long turnsToFire;
-    boolean shooting;
+    EnemyRobot targetRobot;
 
     public Shooter(Sprak sprak) {
         this.sprak = sprak;
-        hardTargetLock = false;
-        softTargetLock = false;
-        shooting = false;
-        turnsToFire = 10;
     }
 
     public void prepareShot(Vector moveVector){
         turnsToFire = Math.round(Math.ceil(sprak.getGunHeat()/0.1));
 
-        String targetName = targetSelection();
-        aim(targetName, moveVector);
+        targetRobot = sprak.enemyRobots.get(targetSelection());
+        double bulletPower = aim(moveVector);
 
-
+        if(canFire() && bulletPower >= 1 && targetRobot.getInfoAge() < 2){
+            sprak.setFire(bulletPower);
+        }
     }
 
     private String targetSelection(){
@@ -42,50 +35,46 @@ public class Shooter {
                 targetRobotName = entry.getKey();
             }
         }
-        System.out.println("target: " + targetRobotName);
         return targetRobotName;
     }
 
-    private void aim(String targetName, Vector moveVector){
-        Point sprakPosition = sprak.position.addVector(moveVector.multiply(1));
-        System.out.println("moveVector: " + moveVector);
-        System.out.println("sparkAjustedPos: " + sprakPosition);
-        if (targetName.equals("")){
-            return;
-        }
-        EnemyRobot enemyRobot = sprak.enemyRobots.get(targetName);
-        System.out.println(enemyRobot);
-        System.out.println(enemyRobot.estimatedPosition(0));
+    private double aim(Vector moveVector){
+        Point sprakPosition = sprak.position.addVector(moveVector);
+        double timeToTargetLimit = 30;
 
-        Point targetPoint = enemyRobot.getPosition();
+        Point targetPoint = targetRobot.getPosition();
         double distance = sprakPosition.distanceToPoint(targetPoint);
-        System.out.println(distance);
         double addedTime = turnsToFire + distance/11;
-        int iter = 6;
-        while(true){
-            targetPoint = enemyRobot.estimatedPosition(Math.round(addedTime));
+        double bulletSpeed = 11;
+        int iter = 10;
+        while(iter>0){
+            targetPoint = targetRobot.estimatedPosition(Math.round(addedTime));
             double newDistance = sprakPosition.distanceToPoint(targetPoint);
-            double addTimeToTarget = (newDistance-distance)/19.7;
+            double addTimeToTarget = (newDistance-distance)/bulletSpeed;
             addedTime += addTimeToTarget;
-            System.out.println("addTimeToTarget: " + addTimeToTarget );
+            if (addedTime > timeToTargetLimit){
+                bulletSpeed = addedTime/timeToTargetLimit * bulletSpeed;
+                addedTime = timeToTargetLimit;
+                iter--;
+                continue;
+            }
             distance = newDistance;
             iter--;
-            if (iter<0){
-                break;
-            }
-            System.out.println("iterTarget: " + targetPoint );
         }
-        System.out.println("finalTargetPos " + targetPoint);
         Vector vectorToTarget = sprakPosition.vectorTo(targetPoint);
         double angleToTarget = sprak.gunHeading.angleToVector(vectorToTarget);
         sprak.setGunRotationRate(-angleToTarget);
+        return -(bulletSpeed-20)/3;
     }
-
-    public void fire(){
-        sprak.fire(0.1);
-    }
-
     public boolean canFire(){
         return turnsToFire <= 1;
+    }
+
+    public EnemyRobot getTargetRobot() {
+        return targetRobot;
+    }
+
+    public long getTurnsToFire() {
+        return turnsToFire;
     }
 }
