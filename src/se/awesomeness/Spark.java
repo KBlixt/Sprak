@@ -44,7 +44,7 @@ public class Spark extends Robot {
             }
 
 
-            calculateFire(closestDistance, angleToClosestBot);
+            calculateFire();
             ahead(200);
 
             calculateRadar();
@@ -60,7 +60,7 @@ public class Spark extends Robot {
                 }
             }
 
-            calculateFire(closestDistance, angleToClosestBot);
+            calculateFire();
             back(200);
 
 
@@ -78,27 +78,66 @@ public class Spark extends Robot {
         turnRadarRight(360);
     }
 
-    public void calculateFire(double distanceToEnemy, double angleToTarget) {
+    public void calculateFire() {
+
+        double[] target = pickTarget();
+        double distanceToTarget = target[0];
+        double angleToTarget = target[1];
 
         double adjustAngle = angleToTarget + (getHeading() - getGunHeading());
-
-        // Följande kod reducerar vinkeln till den minsta ekvivalent vinkeln.
-        adjustAngle %= 360;
-        if (adjustAngle > 180) {
-            adjustAngle -= 360;
-        } else if (adjustAngle < -180) {
-            adjustAngle += 360;
-        }
-
-        //vrider oss och skjuter
+        adjustAngle = reduceAngle(adjustAngle);
         turnGunRight(adjustAngle);
-        if (distanceToEnemy < 200) {
-            fireBullet(3);
-        } else if (distanceToEnemy < 350 || opponentsLeft > 5) {
-            fireBullet(2);
-        } else {
-            fireBullet(1);
+
+        double bulletPower = pickBulletPower(distanceToTarget);
+        if (distanceToTarget > 0){
+            fire(bulletPower);
         }
+    }
+
+    public double reduceAngle(double angle){
+        // Följande kod reducerar vinkeln till den minsta ekvivalenta vinkeln.
+        angle %= 360;
+        if (angle > 180) {
+            angle -= 360;
+        } else if (angle < -180) {
+            angle += 360;
+        }
+        return angle;
+    }
+
+    public double[] pickTarget(){
+        double distanceToClosestBotWeighted = -1;
+        double angleToClosestBotWeighted = 0;
+        double heading = getHeading();
+        double prioritizedAngle = 25;
+
+        for (Map.Entry<Double, Double> entry : botDistanceAndBearing.entrySet()) {
+            double distance = entry.getKey();
+            double bearing = entry.getValue();
+            double absoluteAngle = reduceAngle(heading + bearing);
+            boolean insideZoneRight = 90+prioritizedAngle > absoluteAngle && absoluteAngle > 90-prioritizedAngle;
+            boolean insideZoneLeft =  270+prioritizedAngle > absoluteAngle && absoluteAngle > 270-prioritizedAngle;
+            if (insideZoneLeft || insideZoneRight){
+                distance *= 0.25;
+            }
+            if (distance < distanceToClosestBotWeighted || distanceToClosestBotWeighted == -1){
+                angleToClosestBotWeighted = bearing;
+                distanceToClosestBotWeighted = distance;
+            }
+        }
+        return new double[]{distanceToClosestBotWeighted,angleToClosestBotWeighted};
+    }
+
+    public double pickBulletPower(double distanceToEnemy){
+        double bulletPower;
+        if (distanceToEnemy < 200) {
+            bulletPower = 3;
+        } else if (distanceToEnemy < 350 || opponentsLeft > 5) {
+            bulletPower = 2;
+        } else {
+            bulletPower = 1;
+        }
+        return bulletPower;
     }
 
     public void overrideFire(double angleToTarget) {
