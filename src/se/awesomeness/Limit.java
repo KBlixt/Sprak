@@ -15,12 +15,12 @@ public record Limit(LimitType type, double limit) {
                 }else{
                     closestPointVector = new Vector(limit, pointVector.negative().getDirection());
                 }
-                closestPoint = closestPointVector.getFreeForm();
+                closestPoint = closestPointVector.getPoint();
             }
             case TURN_RIGHT_LIMIT, TURN_LEFT_LIMIT -> {
                 double adjustVectorMagnitude = Math.sin(Math.toRadians(pointVector.getDirection() - limit)) * pointVector.getMagnitude();
                 double adjustVectorDirection = limit - 90;
-                closestPoint =  pointVector.add(new Vector(adjustVectorMagnitude, adjustVectorDirection)).getFreeForm();
+                closestPoint =  pointVector.add(new Vector(adjustVectorMagnitude, adjustVectorDirection)).getPoint();
             }
             default ->
                     System.out.println("<ERROR> no type match in switch in Function.closestPoint. type: " + type.name());

@@ -32,11 +32,12 @@ public class Point {
     }
 
     public void setPoint(Point point){
-        setPoint(point.getX(), point.getY());
+        x = point.x;
+        y = point.y;
     }
 
     public void setPoint(Vector vector){
-        setPoint(vector.getFreeForm());
+        setPoint(vector.getPoint());
     }
 
 
@@ -51,8 +52,8 @@ public class Point {
 
     public Point addVector(Vector vector){
         return new Point(
-                getX() + vector.getFreeForm().getX(),
-                getY() + vector.getFreeForm().getY());
+                getX() + vector.getPoint().getX(),
+                getY() + vector.getPoint().getY());
     }
 
     public Point subtractVector(Vector vector){
@@ -60,50 +61,38 @@ public class Point {
     }
 
     public Point closestPoint(List<Point> points){
-        int closestPointIndex = 0;
+        Point closestPoint = points.get(0);
+        double shortestDistance = distanceTo(closestPoint);
 
-        double shortestDistance = Math.sqrt(Math.pow(
-                points.get(closestPointIndex).x - x,2)
-                + Math.pow(points.get(closestPointIndex).y - y,2));
-
-        double distance;
         for ( int i = 1; i < points.size(); i++){
-
-            distance = Math.sqrt(Math.pow(
-                    points.get(i).x - x,2)
-                    + Math.pow(points.get(i).y - y,2));
+            Point candidate = points.get(i);
+            double distance = distanceTo(candidate);
 
             if (distance < shortestDistance){
-                closestPointIndex = i;
+                closestPoint = candidate;
                 shortestDistance = distance;
             }
         }
-        return points.get(closestPointIndex);
+        return closestPoint;
     }
 
     public Point furthestPoint(List<Point> points){
-        int furthestPointIndex = 0;
+        Point furthestPoint = points.get(0);
+        double longestDistance = distanceTo(furthestPoint);
 
-        double shortestDistance = Math.sqrt(Math.pow(
-                points.get(furthestPointIndex).x - x,2)
-                + Math.pow(points.get(furthestPointIndex).y - y,2));
-
-        double distance;
         for ( int i = 1; i < points.size(); i++){
+            Point candidate = points.get(i);
+            double distance = distanceTo(candidate);
 
-            distance = Math.sqrt(Math.pow(
-                    points.get(i).x - x,2)
-                    + Math.pow(points.get(i).y - y,2));
-
-            if (distance > shortestDistance){
-                furthestPointIndex = i;
-                shortestDistance = distance;
+            if (distance > longestDistance){
+                furthestPoint = candidate;
+                longestDistance = distance;
             }
         }
-        return points.get(furthestPointIndex);
+        return furthestPoint;
     }
 
-    public double distanceToPoint(Point toPoint){
+    public double distanceTo(Point toPoint){
         double deltaX = x - toPoint.x;
         double deltaY = y - toPoint.y;
 

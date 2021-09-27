@@ -29,7 +29,7 @@ public class Shooter {
 
         for (Map.Entry<String, EnemyRobot> entry : sprak.enemyRobots.entrySet()) {
             Point position = entry.getValue().estimatedPosition(turnsToFire);
-            double distance = sprak.position.distanceToPoint(position);
+            double distance = sprak.position.distanceTo(position);
             if ( distance < shortestDistance || shortestDistance == -1){
                 shortestDistance = distance;
                 targetRobotName = entry.getKey();
@@ -43,13 +43,13 @@ public class Shooter {
         double timeToTargetLimit = 30;
 
         Point targetPoint = targetRobot.getPosition();
-        double distance = sprakPosition.distanceToPoint(targetPoint);
+        double distance = sprakPosition.distanceTo(targetPoint);
         double addedTime = turnsToFire + distance/11;
         double bulletSpeed = 11;
         int iter = 10;
         while(iter>0){
             targetPoint = targetRobot.estimatedPosition(Math.round(addedTime));
-            double newDistance = sprakPosition.distanceToPoint(targetPoint);
+            double newDistance = sprakPosition.distanceTo(targetPoint);
             double addTimeToTarget = (newDistance-distance)/bulletSpeed;
             addedTime += addTimeToTarget;
             if (addedTime > timeToTargetLimit){

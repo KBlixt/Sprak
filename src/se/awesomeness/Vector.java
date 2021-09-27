@@ -44,9 +44,8 @@ public class Vector {
     }
 
     public void setVector(Vector vector){
-        setVector(
-                vector.getMagnitude(),
-                vector.getDirection());
+        magnitude = vector.magnitude;
+        direction = vector.direction;
     }
 
 
@@ -66,18 +65,18 @@ public class Vector {
         return magnitude * Math.sin(Math.toRadians(direction));
     }
 
-    public Point getFreeForm() {
+    public Point getPoint() {
         return new Point(getX(),getY());
     }
 
 
-    public Vector add(Vector vectorToAdd){
-        Point freeForm = getFreeForm();
-        Point vectorToAddFreeForm = vectorToAdd.getFreeForm();
+    public Vector add(Vector vector){
+        Point vectorPoint = getPoint();
+        Point vectorAddPoint = vector.getPoint();
 
         return new Vector( new Point(
-                freeForm.getX() + vectorToAddFreeForm.getX(),
-                freeForm.getY() + vectorToAddFreeForm.getY()));
+                vectorPoint.getX() + vectorAddPoint.getX(),
+                vectorPoint.getY() + vectorAddPoint.getY()));
     }
 
     public Vector subtract(Vector vector){
@@ -112,6 +111,7 @@ public class Vector {
     public String toString(){
         return "[vector]: (Magnitude: " + getMagnitude() + " , Direction: " + getDirection() + ")";
     }
+
 
     public static Vector addAll(List<Vector> vectors){
         Vector sumVector = new Vector();

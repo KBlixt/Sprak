@@ -58,7 +58,7 @@ public class EnemyRobot {
                 continue;
             }
 
-            double distance = estimatedPosition(0).distanceToPoint(robotEntry.getValue().estimatedPosition(0));
+            double distance = estimatedPosition(0).distanceTo(robotEntry.getValue().estimatedPosition(0));
             if (distance < shortestDistance){
                 shortestDistance = distance;
             }
