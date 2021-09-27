@@ -39,9 +39,6 @@ public class Spark extends Robot {
 
             calculateFire();
             back(200);
-
-
-
         }
     }
 
@@ -56,9 +53,9 @@ public class Spark extends Robot {
 
         opponentsLeft = getOthers();
         double closestDistance = 100_000_000;
-        for (int i = 0; i < robotNames.size(); i++) {
-            if (robotNames.get(i).getDistance() < closestDistance) {
-                closestDistance = robotNames.get(i).getDistance();
+        for (ScannedRobotEvent robotName : robotNames) {
+            if (robotName.getDistance() < closestDistance) {
+                closestDistance = robotName.getDistance();
             }
         }
     }
