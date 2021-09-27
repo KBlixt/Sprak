@@ -16,7 +16,7 @@ public class EnemyRobot {
 
     private double threatDistance;
     private double threatDistanceSpeed;
-    private double threatLastUpdateTime;
+    private double threatInfoAge;
 
 
     public EnemyRobot(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading){
@@ -38,9 +38,7 @@ public class EnemyRobot {
         );
         Vector oldVelocity = velocity;
         velocity = new Vector(scannedRobot.getVelocity(), Tools.convertAngle(scannedRobot.getHeading()));
-
-        long timeDelta = scannedRobot.getTime() - infoAge;
-        acceleration = velocity.subtract(oldVelocity).divide(timeDelta);
+        acceleration = velocity.subtract(oldVelocity).divide(infoAge);
 
         infoAge = 0;
 
@@ -48,8 +46,10 @@ public class EnemyRobot {
 
     public void updateAge(){
         infoAge++;
+        threatInfoAge++;
     }
-    public void updateThreatDistance(Map<String, EnemyRobot> enemyRobots,long time) {
+
+    public void updateThreatDistance(Map<String, EnemyRobot> enemyRobots) {
         double shortestDistance = 600;
 
         for (Map.Entry<String, EnemyRobot> robotEntry : enemyRobots.entrySet()) {
@@ -58,19 +58,18 @@ public class EnemyRobot {
                 continue;
             }
 
-            double distance = estimatedPosition(time).distanceToPoint(robotEntry.getValue().estimatedPosition(time));
+            double distance = estimatedPosition(0).distanceToPoint(robotEntry.getValue().estimatedPosition(0));
             if (distance < shortestDistance){
                 shortestDistance = distance;
             }
         }
         if (threatDistance == -1){
             threatDistance = shortestDistance;
-            threatLastUpdateTime = time + 1;
+            threatInfoAge = 0;
         }
-        threatDistanceSpeed = (shortestDistance - threatDistance) / (time - threatLastUpdateTime);
+        threatDistanceSpeed = (shortestDistance - threatDistance) / threatInfoAge;
         threatDistance = shortestDistance;
-        threatLastUpdateTime = time;
-
+        threatInfoAge = 0;
     }
 
 
@@ -94,6 +93,9 @@ public class EnemyRobot {
         return position;
     }
 
+    public long getInfoAge() {
+        return infoAge;
+    }
 
     public Point estimatedPosition(long time){
             return new Point(
