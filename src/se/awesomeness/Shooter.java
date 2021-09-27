@@ -4,16 +4,17 @@ import java.util.Map;
 
 public class Shooter {
 
-    Vector gunHeading;
-    Point nextPosition;
-    Map<String, EnemyRobot> enemyRobots;
-    EnemyRobot target;
+    private final Vector gunHeading;
+    private final Point nextPosition;
+    private final Map<String, EnemyRobot> enemyRobots;
+    private final EnemyRobot target;
 
-    int turnsToFire;
+    private int turnsToFire;
 
-    boolean setFire;
-    double adjustGunAngle;
-    double bulletPower;
+    private boolean setFire;
+    private double adjustGunAngle;
+    private double bulletPower;
+    private EnemyRobot nextTarget;
 
 
 
@@ -26,7 +27,7 @@ public class Shooter {
 
     public void prepareShot(int turnsToFire){
         this.turnsToFire = turnsToFire;
-        target = enemyRobots.get(targetSelection());
+        nextTarget = enemyRobots.get(targetSelection());
         aim();
         setFire = turnsToFire < 1 && bulletPower >= 1 && target.getInfoAge() < 2;
     }
@@ -83,5 +84,8 @@ public class Shooter {
     }
     public double getBulletPower(){
         return bulletPower;
+    }
+    public EnemyRobot getNextTarget() {
+        return nextTarget;
     }
 }

@@ -5,14 +5,14 @@ import java.util.List;
 
 public class Mover {
 
-        Point position;
-        Vector velocity;
-        Point nextPosition;
-        double wallHeight;
-        double wallWidth;
+    private final Point position;
+    private final Vector velocity;
+    private final double wallHeight;
+    private final double wallWidth;
 
-        double nextSpeed;
-        double nextTurn;
+    private Point nextPosition;
+    private double nextSpeed;
+    private double nextTurn;
 
 
 
@@ -52,11 +52,11 @@ public class Mover {
 
         double sprakX = position.getX();
         double sprakY = position.getY();
-        double minX = 18.5;
-        double minY = 18.5;
-        double maxX = wallWidth - 18.5;
-        double maxY = wallHeight - 18.5;
-        double magnitude = 118;//calculateLookAhead((minX + maxX)/2, (minY+maxY)/2);
+        double minX = 19.5;
+        double minY = 19.5;
+        double maxX = wallWidth - 19.5;
+        double maxY = wallHeight - 19.5;
+        double magnitude = calculateLookAhead((minX + maxX)/2, (minY+maxY)/2);
         force = new Vector(magnitude,force.getDirection());
 
         double distToWallX;
