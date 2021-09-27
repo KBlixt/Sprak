@@ -3,7 +3,7 @@ package se.awesomeness;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Mover {
+public class Driver {
 
     private final Point position;
     private final Vector velocity;
@@ -16,7 +16,7 @@ public class Mover {
 
 
 
-    public Mover(Point position, Vector velocity, double wallWidth, double wallHeight) {
+    public Driver(Point position, Vector velocity, double wallWidth, double wallHeight) {
         this.position = position;
         this.velocity = velocity;
 
@@ -24,7 +24,7 @@ public class Mover {
         this.wallHeight = wallHeight;
     }
 
-    public void testMoving(){
+    public void drive(){
         double speed = velocity.getMagnitude();
         double heading = velocity.getDirection();
         List<Vector> forces = new ArrayList<>();
@@ -125,24 +125,24 @@ public class Mover {
         if (velocity.getMagnitude()==0){
             return 120;
         }
-        double magnitudeXpart;
-        double magnitudeYpart;
+        double magnitudePartX;
+        double magnitudePartY;
 
         if(position.getX()>midX){
-            magnitudeXpart = Math.max(velocity.getX(), 0);
+            magnitudePartX = Math.max(velocity.getX(), 0);
         }else{
-            magnitudeXpart = Math.min(velocity.getX(), 0);
+            magnitudePartX = Math.min(velocity.getX(), 0);
         }
         if(position.getY()>midY){
-            magnitudeYpart = Math.max(velocity.getY(), 0);
+            magnitudePartY = Math.max(velocity.getY(), 0);
         }else{
-            magnitudeYpart = Math.min(velocity.getY(), 0);
+            magnitudePartY = Math.min(velocity.getY(), 0);
         }
         double targetMagnitude = 120;
-        magnitudeXpart = Math.abs(magnitudeXpart/velocity.getMagnitude())*targetMagnitude;
-        magnitudeYpart = Math.abs(magnitudeYpart/velocity.getMagnitude())*targetMagnitude;
+        magnitudePartX = Math.abs(magnitudePartX/velocity.getMagnitude())*targetMagnitude;
+        magnitudePartY = Math.abs(magnitudePartY/velocity.getMagnitude())*targetMagnitude;
 
-        return magnitudeXpart+magnitudeYpart+10;
+        return magnitudePartX+magnitudePartY+10;
     }
 
     private void move(Vector force){

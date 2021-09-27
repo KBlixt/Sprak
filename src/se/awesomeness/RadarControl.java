@@ -1,28 +1,31 @@
 package se.awesomeness;
 
 public class RadarControl {
-    Sprak sprak;
-    long nextAction;
-    public RadarControl(Sprak sprak){
-        this.sprak = sprak;
+    private long nextAction;
+    private double nextRadarTurn;
+
+    public RadarControl(){
         nextAction = 1;
     }
 
-    public void defaultMonitoring(EnemyRobot target){
-        long timeToFire = sprak.turnsToFire;
+    public void monitor(int turnsToFire){
         nextAction--;
         if (nextAction==0){
-            if (timeToFire>11){
-                sprak.setRadarRotationRate(45);
+            if (turnsToFire>11){
+                nextRadarTurn = 45;
                 nextAction = 8;
             }else{
-                robotMonitoring(target);
+                //robotMonitoring(target);
                 nextAction = 1;
             }
         }
     }
 
     public void robotMonitoring(EnemyRobot target){
+        nextRadarTurn = 45;
+    }
 
+    public double getNextRadarTurn() {
+        return nextRadarTurn;
     }
 }

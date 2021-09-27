@@ -8,74 +8,77 @@ import java.util.Map;
 
 public class Sprak extends RateControlRobot {
 
-    Point position = new Point();
-    Vector normalVelocity = new Vector();
-    Point nextPosition = new Point();
-
-    Vector gunHeading = new Vector();
+    private final Point position = new Point();
+    private final Vector normalVelocity = new Vector();
+    private final Map<String, EnemyRobot> enemyRobots = new HashMap<>();
+    private final List<String> deadRobots = new ArrayList<>();
+    private final Vector gunHeading = new Vector();
 
     Integer turnsToFire = 16;
-    EnemyRobot targetRobot;
 
-    Map<String, EnemyRobot> enemyRobots = new HashMap<>();
-    List<String> deadRobots = new ArrayList<>();
-
-    Mover mover;
-    Shooter shooter;
-
-    RadarControl radarControl = new RadarControl(this);
+    //operators
+    private Driver driver;
+    private Shooter shooter;
+    private RadarControl radarControl;
 
     public void run(){
+        startOfRoundAction();
+
+        Point nextPosition;
+        EnemyRobot target;
+        while (getOthers() > 0) {
+            driver.drive();
+            nextPosition = driver.getNextPosition();
+
+            shooter.prepareShot(nextPosition, turnsToFire);
+
+            radarControl.monitor(turnsToFire);
+
+            cleanUp();
+            execute();
+        }
+
+        endOfRoundAction();
+    }
+
+    private void startOfRoundAction(){
         setAdjustGunForRobotTurn(true);
         setAdjustRadarForGunTurn(true);
 
-        mover = new Mover(
+        driver = new Driver(
                 position,
                 normalVelocity,
                 getBattleFieldWidth(),
                 getBattleFieldHeight()
         );
+
         shooter = new Shooter(
                 gunHeading,
-                nextPosition,
-                enemyRobots,
-                targetRobot);
+                enemyRobots
+        );
+
+        radarControl = new RadarControl(
+        );
 
         setGunRotationRate(20);
         setRadarRotationRate(45);
         setTurnRate(10);
         setVelocityRate(8);
         while (enemyRobots.isEmpty()){
-            execute();
+            super.execute();
         }
+    }
 
-        while (!enemyRobots.isEmpty()) {
-            mover.testMoving();
-            setVelocityRate(mover.getNextSpeed());
-            setTurnRate(mover.getNextTurn());
-            nextPosition.setPoint(mover.getNextPosition());
-
-            shooter.prepareShot(turnsToFire);
-            setGunRotationRate(shooter.getAdjustGunAngle());
-            if(shooter.getSetFire()){
-                setFire(shooter.getBulletPower());
-            }
-
-            radarControl.defaultMonitoring(targetRobot);
-
-            cleanUp();
-            execute();
-        }
-
+    private void endOfRoundAction(){
         setVelocityRate(0);
         setTurnRate(10);
         setGunRotationRate(-20);
         while(enemyRobots.isEmpty()){
-            execute();
+            super.execute();
         }
     }
 
-    public void cleanUp(){
+    private void cleanUp(){
         for (Map.Entry<String, EnemyRobot> robotEntry : enemyRobots.entrySet()) {
             robotEntry.getValue().updateAge();
         }
@@ -88,7 +91,6 @@ public class Sprak extends RateControlRobot {
         normalVelocity.setVector(getVelocity(), Tools.convertAngle(getHeading()));
         gunHeading.setVector(1,Tools.convertAngle(getGunHeading()));
         turnsToFire = (int)Math.round(Math.ceil(getGunHeat()/0.1));
-        System.out.println("realTurnsToFire" + turnsToFire);
         for (Map.Entry<String, EnemyRobot> robotEntry : enemyRobots.entrySet()) {
             robotEntry.getValue().updateThreatDistance(enemyRobots);
         }
@@ -116,4 +118,17 @@ public class Sprak extends RateControlRobot {
         enemyRobots.remove(deadRobotName);
         super.onRobotDeath(event);
     }
+
+    @Override
+    public void execute(){
+        setVelocityRate(driver.getNextSpeed());
+        setTurnRate(driver.getNextTurn());
+        setGunRotationRate(shooter.getAdjustGunAngle());
+        setRadarRotationRate(radarControl.getNextRadarTurn());
+        if(shooter.getSetFire()){
+            setFire(shooter.getBulletPower());
+        }
+        super.execute();
+    }
+
 }
