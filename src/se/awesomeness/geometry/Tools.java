@@ -1,4 +1,4 @@
-package se.awesomeness;
+package se.awesomeness.geometry;
 
 public class Tools {
 

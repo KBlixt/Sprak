@@ -1,4 +1,4 @@
-package se.awesomeness;
+package se.awesomeness.geometry;
 
 public enum LimitType {
     TURN_RIGHT_LIMIT,

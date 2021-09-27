@@ -1,6 +1,13 @@
 package se.awesomeness;
 
 import robocode.*;
+import se.awesomeness.geometry.Point;
+import se.awesomeness.geometry.Tools;
+import se.awesomeness.geometry.Vector;
+import se.awesomeness.operators.Driver;
+import se.awesomeness.operators.RadarControl;
+import se.awesomeness.operators.Shooter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

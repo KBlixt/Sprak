@@ -1,4 +1,6 @@
-package se.awesomeness;
+package se.awesomeness.operators;
+
+import se.awesomeness.geometry.*;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package se.awesomeness;
+package se.awesomeness.geometry;
 
 public record Limit(LimitType type, double limit) {
 

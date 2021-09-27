@@ -1,6 +1,9 @@
 package se.awesomeness;
 
 import robocode.ScannedRobotEvent;
+import se.awesomeness.geometry.Point;
+import se.awesomeness.geometry.Tools;
+import se.awesomeness.geometry.Vector;
 
 import java.util.Map;
 

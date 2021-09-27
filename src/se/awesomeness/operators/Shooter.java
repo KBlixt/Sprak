@@ -1,4 +1,8 @@
-package se.awesomeness;
+package se.awesomeness.operators;
+
+import se.awesomeness.EnemyRobot;
+import se.awesomeness.geometry.Point;
+import se.awesomeness.geometry.Vector;
 
 import java.util.Map;
 

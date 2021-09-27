@@ -1,4 +1,6 @@
-package se.awesomeness;
+package se.awesomeness.operators;
+
+import se.awesomeness.EnemyRobot;
 
 public class RadarControl {
     private long nextAction;
