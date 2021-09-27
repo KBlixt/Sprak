@@ -10,8 +10,10 @@ public class Sprak extends RateControlRobot {
 
     Point position = new Point();
     Vector normalVelocity = new Vector();
-    Vector gunHeading = new Vector();
+    Point nextPosition = new Point();
     Vector nextMove = new Vector();
+
+    Vector gunHeading = new Vector();
 
     long turnsToFire = 16;
     EnemyRobot targetRobot;
@@ -19,13 +21,23 @@ public class Sprak extends RateControlRobot {
     Map<String, EnemyRobot> enemyRobots = new HashMap<>();
     List<String> deadRobots = new ArrayList<>();
 
-    Mover mover = new Mover(this);
+    Mover mover;
+
     Shooter shooter = new Shooter(this);
     RadarControl radarControl = new RadarControl(this);
 
     public void run(){
         setAdjustGunForRobotTurn(true);
         setAdjustRadarForGunTurn(true);
+
+        mover = new Mover(
+                position,
+                normalVelocity,
+                nextPosition,
+                nextMove,
+                getBattleFieldWidth(),
+                getBattleFieldHeight()
+        );
 
         setGunRotationRate(20);
         setRadarRotationRate(45);
@@ -37,7 +49,8 @@ public class Sprak extends RateControlRobot {
 
         while (!enemyRobots.isEmpty()) {
             mover.testMoving();
-            nextMove.setVector(mover.getNextMove());
+            setVelocityRate(nextMove.getMagnitude());
+            setTurnRate(nextMove.getDirection());
 
             shooter.prepareShot(nextMove);
             targetRobot = shooter.getTargetRobot();
