@@ -9,13 +9,10 @@ import java.util.Map;
 public class Gunner {
 
     private final Vector gunHeading;
-    private final Map<String, EnemyRobot> enemyRobots;
 
     private int turnsToFire;
     private Point nextPosition;
-    private EnemyRobot target;
 
-    private boolean setFire;
     private double adjustGunAngle;
     private double bulletPower;
 
@@ -23,34 +20,20 @@ public class Gunner {
 
     public Gunner(Vector gunHeading, Map<String, EnemyRobot> enemyRobots) {
         this.gunHeading = gunHeading;
-        this.enemyRobots = enemyRobots;
     }
 
-    public void prepareShot(Point nextPosition, int turnsToFire){
+    public void takeAim(Vector fireSolution){
+        double angleToTarget = gunHeading.angleToVector(fireSolution);
+        adjustGunAngle = -angleToTarget;
+        bulletPower = fireSolution.getMagnitude();
+    }
+
+    public void updateInfo(Point nextPosition, int turnsToFire){
         this.turnsToFire = turnsToFire;
         this.nextPosition = nextPosition;
-
-        target = enemyRobots.get(targetSelection());
-        aim();
-        setFire = turnsToFire < 1 && bulletPower >= 1 && target.getInfoAge() < 2;
     }
 
-    private String targetSelection(){
-        String targetRobotName = "";
-        double shortestDistance = -1;
-
-        for (Map.Entry<String, EnemyRobot> entry : enemyRobots.entrySet()) {
-            Point position = entry.getValue().estimatedPosition(turnsToFire);
-            double distance = nextPosition.distanceTo(position);
-            if ( distance < shortestDistance || shortestDistance == -1){
-                shortestDistance = distance;
-                targetRobotName = entry.getKey();
-            }
-        }
-        return targetRobotName;
-    }
-
-    private void aim(){
+    public Vector findFireSolution(EnemyRobot target){
         double timeToTargetLimit = 30;
 
         Point targetPoint = target.getPosition();
@@ -64,9 +47,22 @@ public class Gunner {
             double newDistance = nextPosition.distanceTo(targetPoint);
             double addTimeToTarget = (newDistance-distance)/bulletSpeed;
             addedTime += addTimeToTarget;
-            if (addedTime > timeToTargetLimit){
+            if (addedTime > timeToTargetLimit && bulletSpeed < 17){
                 bulletSpeed = addedTime/timeToTargetLimit * bulletSpeed;
                 addedTime = timeToTargetLimit;
+                if (bulletSpeed > 17){
+                    addedTime = bulletSpeed/17 * addedTime;
+                    bulletSpeed = 17;
+                }
+                iter--;
+                continue;
+            }
+            if (addedTime < timeToTargetLimit && bulletSpeed > 11){
+                bulletSpeed = addedTime/timeToTargetLimit * bulletSpeed;
+                if (bulletSpeed < 11){
+                    addedTime = bulletSpeed/11 * addedTime;
+                    bulletSpeed = 11;
+                }
                 iter--;
                 continue;
             }
@@ -74,13 +70,11 @@ public class Gunner {
             iter--;
         }
         Vector vectorToTarget = nextPosition.vectorTo(targetPoint);
-        double angleToTarget = gunHeading.angleToVector(vectorToTarget);
-        adjustGunAngle = -angleToTarget;
-        bulletPower = -(bulletSpeed-20)/3;
+        return new Vector(-(bulletSpeed-20)/3,vectorToTarget.getDirection());
     }
 
-    public boolean getSetFire(){
-        return setFire;
+    public boolean readyToFire(){
+        return turnsToFire < 1;
     }
     public double getAdjustGunAngle(){
         return adjustGunAngle;

@@ -20,32 +20,53 @@ public class Sprak extends RateControlRobot {
     private final Map<String, EnemyRobot> enemyRobots = new HashMap<>();
     private final List<String> deadRobots = new ArrayList<>();
     private final Vector gunHeading = new Vector();
+    private final Vector radarHeading = new Vector();
 
-    Integer turnsToFire = 16;
+    int turnsToFire = 16;
 
-    //operators
+    //crew
     private Driver driver;
-    private Gunner turretOperator;
-    private RadarOperator radar;
+    private Gunner gunner;
+    private RadarOperator radarOp;
 
     public void run(){
         startOfRoundAction();
 
         Point nextPosition;
         EnemyRobot target;
+        Vector fireSolution;
         while (getOthers() > 0) {
+            target = selectTarget();
+
             driver.drive();
             nextPosition = driver.getNextPosition();
 
-            turretOperator.prepareShot(nextPosition, turnsToFire);
+            gunner.updateInfo(nextPosition, turnsToFire);
+            fireSolution = gunner.findFireSolution(target);
 
-            radar.monitor(turnsToFire);
+            gunner.takeAim(fireSolution);
 
-            cleanUp();
+            radarOp.monitor(target,turnsToFire);
+
             execute();
         }
 
         endOfRoundAction();
+    }
+
+    private EnemyRobot selectTarget(){
+        EnemyRobot target = null;
+        double shortestDistance = -1;
+        for (Map.Entry<String, EnemyRobot> entry : enemyRobots.entrySet()) {
+            EnemyRobot enemyRobot = entry.getValue();
+            Point enemyPosition = enemyRobot.estimatedPosition(turnsToFire);
+            double distance = position.distanceTo(enemyPosition);
+            if ( distance < shortestDistance || shortestDistance == -1){
+                shortestDistance = distance;
+                target = enemyRobot;
+            }
+        }
+        return target;
     }
 
     private void startOfRoundAction(){
@@ -59,12 +80,14 @@ public class Sprak extends RateControlRobot {
                 getBattleFieldHeight()
         );
 
-        turretOperator = new Gunner(
+        gunner = new Gunner(
                 gunHeading,
                 enemyRobots
         );
 
-        radar = new RadarOperator(
+        radarOp = new RadarOperator(
+                position,
+                radarHeading
         );
 
         setGunRotationRate(20);
@@ -97,6 +120,7 @@ public class Sprak extends RateControlRobot {
         position.setPoint(getX(), getY());
         normalVelocity.setVector(getVelocity(), Tools.convertAngle(getHeading()));
         gunHeading.setVector(1,Tools.convertAngle(getGunHeading()));
+        radarHeading.setVector(1,Tools.convertAngle(getRadarHeading()));
         turnsToFire = (int)Math.round(Math.ceil(getGunHeat()/0.1));
         for (Map.Entry<String, EnemyRobot> robotEntry : enemyRobots.entrySet()) {
             robotEntry.getValue().updateThreatDistance(enemyRobots);
@@ -130,11 +154,12 @@ public class Sprak extends RateControlRobot {
     public void execute(){
         setVelocityRate(driver.getNextSpeed());
         setTurnRate(driver.getNextTurn());
-        setGunRotationRate(turretOperator.getAdjustGunAngle());
-        setRadarRotationRate(radar.getNextRadarTurn());
-        if(turretOperator.getSetFire()){
-            setFire(turretOperator.getBulletPower());
+        setGunRotationRate(gunner.getAdjustGunAngle());
+        setRadarRotationRate(radarOp.getNextRadarTurn());
+        if(gunner.readyToFire()){
+            setFire(gunner.getBulletPower());
         }
+        cleanUp();
         super.execute();
     }
 
