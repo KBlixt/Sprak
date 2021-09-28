@@ -37,10 +37,10 @@ public class EnemyRobot {
         name = scannedRobot.getName();
         threatDistance = -1;
         velocity = new Vector(scannedRobot.getVelocity(), Tools.convertAngle(scannedRobot.getHeading()));
-        minX = minPoint.getX();
-        minY = minPoint.getY();
-        maxX = maxPoint.getX();
-        maxY = maxPoint.getY();
+        minX = minPoint.getX()+10;
+        minY = minPoint.getY()+10;
+        maxX = maxPoint.getX()-10;
+        maxY = maxPoint.getY()-10;
         updateData(scannedRobot, sparkPosition, sparkHeading);
     }
 
