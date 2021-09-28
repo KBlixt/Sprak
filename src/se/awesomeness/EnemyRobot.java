@@ -5,13 +5,14 @@ import se.awesomeness.geometry.Point;
 import se.awesomeness.geometry.Tools;
 import se.awesomeness.geometry.Vector;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class EnemyRobot {
 
     private final String name;
     private double energy;
-    private long infoAge;
+    private int infoAge;
 
     private Point position;
     private Vector velocity;
@@ -21,17 +22,32 @@ public class EnemyRobot {
     private double threatDistanceSpeed;
     private double threatInfoAge;
 
+    private final ArrayList<Point> estimatedPositions = new ArrayList<>();
+    private final ArrayList<Vector> estimatedVelocities = new ArrayList<>();
+    private final double maxX;
+    private final double maxY;
+    private final double minX;
+    private final double minY;
 
-    public EnemyRobot(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading){
+
+
+
+
+    public EnemyRobot(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading, Point minPoint, Point maxPoint){
         name = scannedRobot.getName();
         threatDistance = -1;
         velocity = new Vector(scannedRobot.getVelocity(), Tools.convertAngle(scannedRobot.getHeading()));
+        minX = minPoint.getX();
+        minY = minPoint.getY();
+        maxX = maxPoint.getX();
+        maxY = maxPoint.getY();
         updateData(scannedRobot, sparkPosition, sparkHeading);
     }
 
 
     public void updateData(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading){
-
+        estimatedPositions.clear();
+        estimatedVelocities.clear();
         energy = scannedRobot.getEnergy();
         position = sparkPosition.addVector(
                 new Vector(
@@ -44,6 +60,8 @@ public class EnemyRobot {
         acceleration = velocity.subtract(oldVelocity).divide(infoAge);
 
         infoAge = 0;
+        estimatedPositions.add(position);
+        estimatedVelocities.add(velocity);
 
     }
 
@@ -100,19 +118,27 @@ public class EnemyRobot {
         return infoAge;
     }
 
-    public Point estimatedPosition(long time){
-            return new Point(
-                    position.addVector(velocity.multiply(infoAge + time))
-            );
-            // todo: adjust for acceleration?
+    public Point estimatedPosition(int time){
+            if (estimatedPositions.size() <= time+infoAge){
+                Point newEstimatedPosition = estimatedPosition(time-1).addVector(estimatedVelocity(time-1));
+                if (newEstimatedPosition.getX() < minX) newEstimatedPosition.setX(minX);
+                if (newEstimatedPosition.getY() < minY) newEstimatedPosition.setY(minY);
+                if (newEstimatedPosition.getX() > maxX) newEstimatedPosition.setX(maxX);
+                if (newEstimatedPosition.getY() > maxY) newEstimatedPosition.setY(maxY);
+                estimatedPositions.add(newEstimatedPosition);
+            }
+        return estimatedPositions.get(time+infoAge);
     }
 
-    public Vector estimatedVelocity(long time){
-        Vector estimatedVelocity = new Vector(
-                velocity.add(acceleration.multiply(infoAge + time))
-        );
-        estimatedVelocity.setVector(Math.max(8,estimatedVelocity.getMagnitude()), estimatedVelocity.getDirection());
-        return estimatedVelocity;
+    public Vector estimatedVelocity(int time){
+        if (estimatedVelocities.size() <= time+infoAge){
+            Vector newEstimatedVelocity = estimatedVelocity(time-1).add(acceleration);
+            if (newEstimatedVelocity.getMagnitude() > 8){
+                newEstimatedVelocity.setMagnitude(8);
+            }
+            estimatedVelocities.add(newEstimatedVelocity);
+        }
+        return estimatedVelocities.get(time+infoAge);
     }
 
     public String toString(){
