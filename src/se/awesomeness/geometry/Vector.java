@@ -48,6 +48,26 @@ public class Vector {
         direction = vector.direction;
     }
 
+    public void setMagnitude(double magnitude){
+        this.magnitude = magnitude;
+    }
+
+    public void setDirection(double direction){
+        this.direction = Tools.shortestAngle(direction);
+    }
+
+    public void setX(double x){
+        Point newFreeform = getPoint();
+        newFreeform.setX(x);
+        setVector(newFreeform);
+    }
+
+    public void setY(double y){
+        Point newFreeform = getPoint();
+        newFreeform.setY(y);
+        setVector(newFreeform);
+    }
+
 
     public double getMagnitude() {
         return magnitude;
