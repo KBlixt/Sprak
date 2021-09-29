@@ -1,9 +1,12 @@
 package se.awesomeness.crew;
 
+import se.awesomeness.EnemyRobot;
 import se.awesomeness.geometry.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class Driver {
 
@@ -11,23 +14,81 @@ public class Driver {
     private final Vector velocity;
     private final double wallHeight;
     private final double wallWidth;
+    private final Map<String, EnemyRobot> enemyRobots;
+    private final ArrayList<Point> pastPositions;
+    private final Point gotHitPosition;
 
     private Point nextPosition;
     private double nextSpeed;
     private double nextTurn;
+    private Point randomPoint = null;
+    private int turnsStandingStill;
 
 
 
-    public Driver(Point position, Vector velocity, double wallWidth, double wallHeight) {
+
+    public Driver(Point position, Vector velocity, Map<String, EnemyRobot> enemyRobots, ArrayList<Point> pastPositions, Point gotHitPosition, double wallWidth, double wallHeight) {
         this.position = position;
         this.velocity = velocity;
-
+        this.enemyRobots = enemyRobots;
+        this.pastPositions = pastPositions;
+        this.gotHitPosition = gotHitPosition;
         this.wallWidth = wallWidth;
         this.wallHeight = wallHeight;
+        turnsStandingStill = 0;
     }
 
     public void drive(){
+        Random rand = new Random();
+        List<Vector> forces = new ArrayList<>();
+        double weight;
+
+        if (Math.abs(velocity.getMagnitude()) < 2){
+            turnsStandingStill++;
+        }else{
+            turnsStandingStill = Math.max(turnsStandingStill-1, 0);
+        }
+
+        Vector forceFromGotHit = gotHitPosition.vectorTo(position);
+        weight = Math.max(Math.min(100/Math.sqrt(forceFromGotHit.getMagnitude()/100)-40 ,100),0);
+        forces.add(forceFromGotHit.setMagnitude(weight));
+
+
+        //add force toward random point
+        if(randomPoint == null || position.distanceTo(randomPoint) < 100 || turnsStandingStill > 20){
+            randomPoint = new Point(rand.nextDouble()*wallWidth, rand.nextDouble()*wallHeight);
+            turnsStandingStill = 5;
+        }
+        forces.add(position.vectorTo(randomPoint).setMagnitude(Math.abs(25)));
+
+        //add forces from opponents.
+        for (Map.Entry<String, EnemyRobot> entry : enemyRobots.entrySet()) {
+            Vector forceFromEnemy = entry.getValue().estimatedPosition(12).vectorTo(position);
+            weight = Math.max(Math.min(100/Math.sqrt(forceFromEnemy.getMagnitude()/100)-40 ,100),0);
+            forces.add(forceFromEnemy.setMagnitude(weight));
+        }
+
+        //add forces from historic positions.
+        /*
+        for(int i = Math.max(pastPositions.size()-20, 0); i < pastPositions.size()-10; i++){
+            Vector forceFromPastPosition = pastPositions.get(i).vectorTo(position);
+            weight = Math.max(Math.min(6/Math.sqrt(forceFromPastPosition.getMagnitude()/6)-1.2 ,3),0);
+            forces.add(forceFromPastPosition.setMagnitude(weight));
+        }
+
+         */
+        //add force perpendicular to target.
+        System.out.println(forces);
+        Vector forceSum = Vector.addAll(forces);
+        System.out.println("forceSum: " + forceSum);
+        Vector forceAfterWall = wallSurfing(forceSum);
+        move(forceAfterWall);
+    }
+
+    public void driveRandomly(){
         double speed = velocity.getMagnitude();
+        Random rand = new Random();
+
         double heading = velocity.getDirection();
         List<Vector> forces = new ArrayList<>();
         System.out.println("[-----------------------------------------------]");
@@ -35,8 +96,12 @@ public class Driver {
         System.out.println("heading: " + heading);
         System.out.println("position: " + position);
         forces.add(velocity);
-        forces.add(new Vector(1,40));
-
+        if(randomPoint == null || position.distanceTo(randomPoint) < 100){
+            randomPoint = new Point(rand.nextDouble()*wallWidth, rand.nextDouble()*wallHeight);
+        }
+        forces.add(position.vectorTo(randomPoint).setMagnitude(Math.abs(velocity.getMagnitude()+1)));
+        System.out.println(randomPoint);
+        System.out.println(forces);
         Vector forceSum = Vector.addAll(forces);
         System.out.println("forceSum: " + forceSum);
 
@@ -46,7 +111,23 @@ public class Driver {
         move(forceAfterWall);
     }
 
-    
+    public void driveAntiGrav(){
+        List<Vector> forces = new ArrayList<>();
+
+        forces.add(velocity);
+
+        for (Map.Entry<String, EnemyRobot> entry : enemyRobots.entrySet()) {
+            forces.add(entry.getValue().estimatedPosition(0).vectorTo(position).setMagnitude(Math.abs(velocity.getMagnitude())*2));
+        }
+
+        Vector forceSum = Vector.addAll(forces);
+        Vector forceAfterWall = wallSurfing(forceSum);
+        move(forceAfterWall);
+    }
+
+
+
+
     private Vector wallSurfing(Vector force){
         if(force.getMagnitude()< 0){
             force = force.negative();
@@ -144,7 +225,7 @@ public class Driver {
         magnitudePartX = Math.abs(magnitudePartX/velocity.getMagnitude())*targetMagnitude;
         magnitudePartY = Math.abs(magnitudePartY/velocity.getMagnitude())*targetMagnitude;
 
-        return magnitudePartX+magnitudePartY+10;
+        return (magnitudePartX+magnitudePartY+10)*(Math.abs(velocity.getMagnitude())/8) + 4;
     }
 
     private void move(Vector force){
