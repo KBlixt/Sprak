@@ -52,12 +52,6 @@ public class Spark extends Robot {
         turnRadarRight(360);
 
         opponentsLeft = getOthers();
-        double closestDistance = 100_000_000;
-        for (ScannedRobotEvent robotName : enemyRobots) {
-            if (robotName.getDistance() < closestDistance) {
-                closestDistance = robotName.getDistance();
-            }
-        }
     }
 
     public void calculateFire() {
@@ -132,16 +126,6 @@ public class Spark extends Robot {
     public void onScannedRobot(ScannedRobotEvent e) {
         mover.updateEnemyPosition(e);
 
-        for (int i = 0; i < enemyRobots.size(); i++) {
-            // IF e's name = first name inside enemyRobots.
-            if (e.getName().equals(enemyRobots.get(i).getName())) {
-
-                // Removes old name from list and adds new.
-                enemyRobots.remove(i);
-                break;
-            }
-        }
-        enemyRobots.add(e);
         //Removes robot from list to add new value
         //Get robots Name(Key) and Distance(Value in a double),
         botDistance.remove(e.getName());
