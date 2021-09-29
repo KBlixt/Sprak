@@ -11,8 +11,6 @@ public class Spark extends Robot {
 
     RobotStatus status;
 
-    // List to keep track of enemyRobots.
-    List<ScannedRobotEvent> enemyRobots = new ArrayList<>();
     Map<String, Double> botDistance = new HashMap<>();
     Map<String, Double> botBearing = new HashMap<>();
 
