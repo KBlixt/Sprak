@@ -24,26 +24,16 @@ public class Spark extends Robot {
         mover = new Mover(this);
         mover.moveToClosestWall(25);
         mover.moveToMidPointOfQuadrant();
-        //  turnLeft(90);
 
         //noinspection InfiniteLoopStatement
         while (true) {
             calculateRadar();
-
             calculateFire();
             ahead(200);
-
             calculateRadar();
-
             calculateFire();
             back(200);
         }
-    }
-
-
-    public void calculateMovement() {
-        ahead(100);
-        back(100);
     }
 
     public void calculateRadar() {
