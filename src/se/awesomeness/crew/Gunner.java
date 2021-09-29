@@ -35,7 +35,7 @@ public class Gunner {
     }
 
     public Vector findFireSolution(EnemyRobot target){
-        double timeLimit = 30 + turnsToFire;
+        double timeLimit = 20 + turnsToFire;
 
         Point targetPoint = target.getPosition();
         double distance = nextPosition.distanceTo(targetPoint);
@@ -62,6 +62,9 @@ public class Gunner {
                 }
             }
             iter--;
+        }
+        if(addedTime > 35){
+            bulletSpeed = 20;
         }
         Vector vectorToTarget = nextPosition.vectorTo(targetPoint);
         return new Vector(-(bulletSpeed-20)/3,vectorToTarget.getDirection());
@@ -100,7 +103,7 @@ public class Gunner {
     }
 
     public boolean isAligned(Vector fireSolution){
-        return gunHeading.angleToVector(fireSolution) == 0;
+        return gunHeading.angleToVector(fireSolution) <= 0.00001 && gunHeading.angleToVector(fireSolution) >= -0.00001;
     }
     public double getAdjustGunAngle(){
         return -adjustGunAngle;
