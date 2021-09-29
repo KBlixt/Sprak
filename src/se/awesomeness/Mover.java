@@ -91,21 +91,6 @@ public class Mover extends Robot {
 
     }
 
-    /**
-     * updates enemyPosition for the enemy scanned.
-     *
-     * @param robot ScannedRobotEvent information to update with.
-     */
-    public void updateEnemyPosition(ScannedRobotEvent robot) {
-
-        double angle = Math.toRadians(spark.getHeading() + robot.getBearing());
-
-        double X = spark.getX() + robot.getDistance() * Math.sin(angle);
-        double Y = spark.getY() + robot.getDistance() * Math.cos(angle);
-
-        enemyPositions.put(robot.getName(), new double[]{X, Y});
-    }
-
 
     private double angleToClosestWall() {
         ArrayList<double[]> wallPoints = generateWallPoints();
@@ -159,29 +144,4 @@ public class Mover extends Robot {
 
         return wallPoints;
     }
-
-    private double getAngleToPoint(double toX, double toY) {
-        double angleToPoint = Math.atan2(
-                toY - spark.getY(),
-                toX - spark.getX()
-        );
-
-        angleToPoint = Math.toDegrees(-angleToPoint) + 90;
-        if (angleToPoint > 180) {
-            angleToPoint = angleToPoint - 360;
-        }
-        return angleToPoint;
-    }
-
-    private double shortestAngle(double fromAngle, double toAngle) {
-        double angleDelta = (toAngle - fromAngle) % 360;
-        if (angleDelta < -180) {
-            return angleDelta + 360;
-        } else if (angleDelta > 180) {
-            return angleDelta - 360;
-        } else {
-            return angleDelta;
-        }
-    }
-
 }

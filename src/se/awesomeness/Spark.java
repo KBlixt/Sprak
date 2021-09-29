@@ -112,7 +112,6 @@ public class Spark extends Robot {
 
     @Override
     public void onScannedRobot(ScannedRobotEvent e) {
-        mover.updateEnemyPosition(e);
 
         //Removes robot from list to add new value
         //Get robots Name(Key) and Distance(Value in a double),
