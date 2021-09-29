@@ -23,10 +23,13 @@ public class Sprak extends RateControlRobot {
     private final Vector radarHeading = new Vector();
     private final Point maxPoint = new Point();
     private final Point minPoint = new Point();
+    private final ArrayList<Point> pastPositions = new ArrayList<>();
+    private final Point gotHitPosition = new Point();
 
 
     int turnsToFire = 16;
     boolean firing;
+    private int wallHits = 0;
 
     //crew
     private Driver driver;
@@ -40,17 +43,18 @@ public class Sprak extends RateControlRobot {
         EnemyRobot target = null;
         Vector fireSolution = new Vector();
         while (getOthers() > 0) {
+            printDiagnostics();
             shouldFire(fireSolution);
-            if (turnsToFire > 6 || target == null || deadRobots.contains(target.getName())) {
+            if (turnsToFire > 6 || target == null || deadRobots.contains(target.getName()) || fireSolution.getMagnitude() < 1) {
                 target = selectTarget();
             }
-            System.out.println(target);
 
             driver.drive();
             nextPosition = driver.getNextPosition();
 
             gunner.updateInfo(nextPosition, turnsToFire);
-            fireSolution = gunner.findFireSolutionAverageLocation(target);
+            fireSolution = gunner.findFireSolution(target);
+            System.out.println("fireSolution: " + fireSolution);
 
             gunner.takeAim(fireSolution);
 
@@ -91,6 +95,9 @@ public class Sprak extends RateControlRobot {
         driver = new Driver(
                 position,
                 normalVelocity,
+                enemyRobots,
+                pastPositions,
+                gotHitPosition,
                 getBattleFieldWidth(),
                 getBattleFieldHeight()
         );
@@ -126,11 +133,16 @@ public class Sprak extends RateControlRobot {
         for (Map.Entry<String, EnemyRobot> robotEntry : enemyRobots.entrySet()) {
             robotEntry.getValue().updateAge();
         }
+        System.out.println("[^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^]");
     }
 
     @Override
     public void onStatus(StatusEvent event) {
         super.onStatus(event);
+        if(position.getX() == 0 && position.getY() == 0){
+            position.setPoint(getX(), getY());
+        }
+        pastPositions.add(new Point(position));
         position.setPoint(getX(), getY());
         normalVelocity.setVector(getVelocity(), Tools.convertAngle(getHeading()));
         gunHeading.setVector(1,Tools.convertAngle(getGunHeading()));
@@ -165,6 +177,14 @@ public class Sprak extends RateControlRobot {
     }
 
     @Override
+    public void onHitByBullet(HitByBulletEvent event) {
+        super.onHitByBullet(event);
+        Vector addVector = position.vectorTo(enemyRobots.get(event.getName()).estimatedPosition(0));
+        gotHitPosition.setPoint(position.addVector(addVector.setDirection(addVector.getDirection()+90).setMagnitude(normalVelocity.getMagnitude()*3)));
+
+    }
+
+    @Override
     public void execute(){
         setVelocityRate(driver.getNextSpeed());
         setTurnRate(driver.getNextTurn());
@@ -175,6 +195,42 @@ public class Sprak extends RateControlRobot {
         }
         cleanUp();
         super.execute();
+    }
+
+    @Override
+    public void onHitWall(HitWallEvent event) {
+        super.onHitWall(event);
+        wallHits++;
+    }
+
+    public void printDiagnostics(){
+        /*
+            private final Point position = new Point();
+    private final Vector normalVelocity = new Vector();
+    private final Map<String, EnemyRobot> enemyRobots = new HashMap<>();
+    private final List<String> deadRobots = new ArrayList<>();
+    private final Vector gunHeading = new Vector();
+    private final Vector radarHeading = new Vector();
+    private final Point maxPoint = new Point();
+    private final Point minPoint = new Point();
+
+
+    int turnsToFire = 16;
+    boolean firing;
+         */
+        System.out.println();
+        System.out.println("[------------------------------------------------------------------]");
+        System.out.println("[---------------------------------------------------------------------------]");
+        System.out.println("[------------------------------------------------------------------]");
+        System.out.println("position: " + position);
+        System.out.println("velocity: " + normalVelocity);
+        System.out.println("gunHeading: " + gunHeading);
+        System.out.println("turnsToFire: " + turnsToFire);
+        System.out.println("firing: " + firing);
+        System.out.println("wallHits: " + wallHits);
+        System.out.println();
+        System.out.println("[vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv]");
+
     }
 
 }
