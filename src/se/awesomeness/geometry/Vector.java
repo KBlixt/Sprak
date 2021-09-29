@@ -26,12 +26,13 @@ public class Vector {
     }
 
 
-    public void setVector(double magnitude, double direction) {
+    public Vector setVector(double magnitude, double direction) {
         this.magnitude = magnitude;
         this.direction = Tools.shortestAngle(direction);
+        return this;
     }
 
-    public void setVector(Point freeForm) {
+    public Vector setVector(Point freeForm) {
         double x = freeForm.getX();
         double y = freeForm.getY();
 
@@ -41,31 +42,37 @@ public class Vector {
         }else{
             direction = 0;
         }
+        return this;
     }
 
-    public void setVector(Vector vector){
+    public Vector setVector(Vector vector){
         magnitude = vector.magnitude;
         direction = vector.direction;
+        return this;
     }
 
-    public void setMagnitude(double magnitude){
+    public Vector setMagnitude(double magnitude){
         this.magnitude = magnitude;
+        return this;
     }
 
-    public void setDirection(double direction){
+    public Vector setDirection(double direction){
         this.direction = Tools.shortestAngle(direction);
+        return this;
     }
 
-    public void setX(double x){
+    public Vector setX(double x){
         Point newFreeform = getPoint();
         newFreeform.setX(x);
         setVector(newFreeform);
+        return this;
     }
 
-    public void setY(double y){
+    public Vector setY(double y){
         Point newFreeform = getPoint();
         newFreeform.setY(y);
         setVector(newFreeform);
+        return this;
     }
 
 
@@ -129,7 +136,7 @@ public class Vector {
     }
 
     public String toString(){
-        return "[vector]: (Magnitude: " + getMagnitude() + " , Direction: " + getDirection() + ")";
+        return "[vector]: (Magnitude: " + getMagnitude() + " , Direction: " + getDirection() + ")\n";
     }
 
 

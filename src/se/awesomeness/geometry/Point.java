@@ -114,6 +114,6 @@ public class Point {
     }
 
     public String toString(){
-        return "[point]: (X: " + getX() + " , Y: " + getY() + ")";
+        return "[point]: (X: " + getX() + " , Y: " + getY() + ")\n";
     }
 }
