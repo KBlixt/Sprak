@@ -13,6 +13,7 @@ public class EnemyRobot {
     private final String name;
     private double energy;
     private int infoAge;
+    private boolean targetLocked;
 
     private Point position;
     private Vector velocity;
@@ -24,6 +25,7 @@ public class EnemyRobot {
 
     private final ArrayList<Point> estimatedPositions = new ArrayList<>();
     private final ArrayList<Vector> estimatedVelocities = new ArrayList<>();
+    private final ArrayList<Point>  pastPositions= new ArrayList<>();
     private final double maxX;
     private final double maxY;
     private final double minX;
@@ -34,21 +36,33 @@ public class EnemyRobot {
 
 
     public EnemyRobot(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading, Point minPoint, Point maxPoint){
-        name = scannedRobot.getName();
-        threatDistance = -1;
-        velocity = new Vector(scannedRobot.getVelocity(), Tools.convertAngle(scannedRobot.getHeading()));
         minX = minPoint.getX()+10;
         minY = minPoint.getY()+10;
         maxX = maxPoint.getX()-10;
         maxY = maxPoint.getY()-10;
-        updateData(scannedRobot, sparkPosition, sparkHeading);
+        name = scannedRobot.getName();
+        threatDistance = -1;
+
+        energy = scannedRobot.getEnergy();
+        position = sparkPosition.addVector(
+                new Vector(
+                        scannedRobot.getDistance(),
+                        sparkHeading-scannedRobot.getBearing()
+                )
+        );
+        velocity = new Vector(scannedRobot.getVelocity(), Tools.convertAngle(scannedRobot.getHeading()));
+        acceleration = new Vector();
+        estimatedPositions.add(position);
+        estimatedVelocities.add(velocity);
+        infoAge = 0;
     }
 
 
-    public void updateData(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading){
+    public void updateIntel(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading){
         estimatedPositions.clear();
         estimatedVelocities.clear();
         energy = scannedRobot.getEnergy();
+        Point lastPosition = position;
         position = sparkPosition.addVector(
                 new Vector(
                         scannedRobot.getDistance(),
@@ -59,10 +73,15 @@ public class EnemyRobot {
         velocity = new Vector(scannedRobot.getVelocity(), Tools.convertAngle(scannedRobot.getHeading()));
         acceleration = velocity.subtract(oldVelocity).divide(infoAge);
 
-        infoAge = 0;
         estimatedPositions.add(position);
         estimatedVelocities.add(velocity);
 
+        Vector addVector = lastPosition.vectorTo(position);
+        for(int i = 0; i>=infoAge-1;i--){
+            pastPositions.add(lastPosition.addVector(addVector.multiply((double)i/infoAge)));
+        }
+        targetLocked = infoAge <= 2;
+        infoAge = 0;
     }
 
     public void updateAge(){
@@ -114,8 +133,8 @@ public class EnemyRobot {
         return position;
     }
 
-    public long getInfoAge() {
-        return infoAge;
+    public boolean isTargetLocked(){
+        return targetLocked && infoAge <= 1;
     }
 
     public Point estimatedPosition(int time){
@@ -150,5 +169,9 @@ public class EnemyRobot {
         out += "Upd : " + infoAge + "\n";
         return out;
 
+    }
+
+    public ArrayList<Point> getPastPositions(){
+        return pastPositions;
     }
 }

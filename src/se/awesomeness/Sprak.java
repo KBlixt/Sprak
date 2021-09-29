@@ -21,8 +21,12 @@ public class Sprak extends RateControlRobot {
     private final List<String> deadRobots = new ArrayList<>();
     private final Vector gunHeading = new Vector();
     private final Vector radarHeading = new Vector();
+    private final Point maxPoint = new Point();
+    private final Point minPoint = new Point();
+
 
     int turnsToFire = 16;
+    boolean firing;
 
     //crew
     private Driver driver;
@@ -33,16 +37,20 @@ public class Sprak extends RateControlRobot {
         startOfRoundAction();
 
         Point nextPosition;
-        EnemyRobot target;
-        Vector fireSolution;
+        EnemyRobot target = null;
+        Vector fireSolution = new Vector();
         while (getOthers() > 0) {
-            target = selectTarget();
+            shouldFire(fireSolution);
+            if (turnsToFire > 6 || target == null || deadRobots.contains(target.getName())) {
+                target = selectTarget();
+            }
+            System.out.println(target);
 
             driver.drive();
             nextPosition = driver.getNextPosition();
 
             gunner.updateInfo(nextPosition, turnsToFire);
-            fireSolution = gunner.findFireSolution(target);
+            fireSolution = gunner.findFireSolutionAverageLocation(target);
 
             gunner.takeAim(fireSolution);
 
@@ -54,6 +62,9 @@ public class Sprak extends RateControlRobot {
         endOfRoundAction();
     }
 
+    private void shouldFire(Vector fireSolution){
+        firing = gunner.isAligned(fireSolution) && turnsToFire <= 0 && fireSolution.getMagnitude() >= 1;
+    }
     private EnemyRobot selectTarget(){
         EnemyRobot target = null;
         double shortestDistance = -1;
@@ -72,6 +83,10 @@ public class Sprak extends RateControlRobot {
     private void startOfRoundAction(){
         setAdjustGunForRobotTurn(true);
         setAdjustRadarForGunTurn(true);
+        minPoint.setX(18);
+        minPoint.setY(18);
+        maxPoint.setX(getBattleFieldWidth()-18);
+        maxPoint.setY(getBattleFieldHeight()-18);
 
         driver = new Driver(
                 position,
@@ -81,8 +96,7 @@ public class Sprak extends RateControlRobot {
         );
 
         gunner = new Gunner(
-                gunHeading,
-                enemyRobots
+                gunHeading
         );
 
         radarOp = new RadarOperator(
@@ -133,9 +147,9 @@ public class Sprak extends RateControlRobot {
 
         if (!deadRobots.contains(robotName)){
             if (!enemyRobots.containsKey(robotName)){
-                enemyRobots.put(robotName, new EnemyRobot(event, position, normalVelocity.getDirection()));
+                enemyRobots.put(robotName, new EnemyRobot(event, position, normalVelocity.getDirection(), minPoint, maxPoint));
             }else{
-                enemyRobots.get(robotName).updateData(event, position, normalVelocity.getDirection());
+                enemyRobots.get(robotName).updateIntel(event, position, normalVelocity.getDirection());
             }
         }
 
@@ -156,7 +170,7 @@ public class Sprak extends RateControlRobot {
         setTurnRate(driver.getNextTurn());
         setGunRotationRate(gunner.getAdjustGunAngle());
         setRadarRotationRate(radarOp.getNextRadarTurn());
-        if(gunner.readyToFire()){
+        if(firing){
             setFire(gunner.getBulletPower());
         }
         cleanUp();
