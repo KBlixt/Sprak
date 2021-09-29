@@ -24,39 +24,6 @@ public class Mover extends Robot {
     }
 
     /**
-     * Moves Spark to the known robot, stops <stopEarlyOffset> pixels early.
-     *
-     * @param stopEarlyOffset pixels to stop early.
-     */
-    public void moveToClosestRobot(double stopEarlyOffset) {
-        String closestRobotName = "";
-        double shortestDistance = 0;
-
-        for (Map.Entry<String, double[]> robotPosition : enemyPositions.entrySet()) {
-
-            double robotDistance = distanceToPoint(robotPosition.getValue()[0], robotPosition.getValue()[1]);
-            String robotName = robotPosition.getKey();
-
-            if (closestRobotName.equals("")) {
-                closestRobotName = robotName;
-                shortestDistance = robotDistance;
-                continue;
-            }
-
-            if (robotDistance < shortestDistance) {
-                shortestDistance = robotDistance;
-                closestRobotName = robotName;
-            }
-        }
-        double[] target = enemyPositions.get(closestRobotName);
-
-        double turnAngle = shortestAngle(spark.getHeading(), getAngleToPoint(target[0], target[1]));
-
-        spark.turnRight(turnAngle);
-        spark.ahead(shortestDistance - stopEarlyOffset);
-    }
-
-    /**
      * Moves Spark to the closest Wall, stops <stopEarlyOffset> pixels early.
      *
      * @param stopEarlyOffset pixels to stop early.
@@ -77,22 +44,10 @@ public class Mover extends Robot {
         double midX = maxX / 2;
         double midY = maxY / 2;
 
-        // Coordinates for each quadrant of the map.
-        // (0.25X,0Y)
-        double lowerLeftQuadrantSideX = maxX * 0.25; // LOW X
-        double lowerLeftQuadrantSideY = maxY * 0; // LOW Y
+        // X-coordinates to compare which side of the quadrant Sprak's on.
+        double lowX = maxX * 0.25; // LOW X
+        double highX = maxX * 0.75; // HIGH X
 
-        // (0.25X,1Y)
-        double upperLeftQuadrantSideX = maxX * 0.25; // LOW X
-        double upperLeftQuadrantSideY = maxY * 1; // HIGH Y
-
-        // (0.75X,0Y)
-        double lowerRightQuadrantSideX = maxX * 0.75; // HIGH X
-        double lowerRightQuadrantSideY = maxY * 0; // LOW Y
-
-        // (0.75X,0Y)
-        double upperRightQuadrantSideX = maxX * 0.75; // HIGH X
-        double upperRightQuadrantSideY = maxY * 1; // HIGH Y
         // Sparks position.
         double sparkX = spark.getX();
         double sparkY = spark.getY();
@@ -104,7 +59,7 @@ public class Mover extends Robot {
         // Upper right quadrant.
         if (isTopSide && isRightSide) {
             // IF right side of the quadrant, turn left.
-            if (sparkX >= upperRightQuadrantSideX) {
+            if (sparkX >= highX) {
                 spark.turnLeft(90);
             } else {
                 spark.turnRight(90);
@@ -112,7 +67,7 @@ public class Mover extends Robot {
 
             // Lower right quadrant.
         } else if (!isTopSide && isRightSide) {
-            if (sparkX >= lowerRightQuadrantSideX) {
+            if (sparkX >= highX) {
                 spark.turnRight(90);
             } else {
                 spark.turnLeft(90);
@@ -120,27 +75,20 @@ public class Mover extends Robot {
 
             // Upper left quadrant.
         } else if (isTopSide) {
-            if (sparkX <= upperLeftQuadrantSideX) {
+            if (sparkX <= lowX) {
                 spark.turnRight(90);
             } else {
                 spark.turnLeft(90);
             }
             // Lower left quadrant.
         } else {
-            if (sparkX <= upperLeftQuadrantSideX) {
+            if (sparkX <= lowX) {
                 spark.turnLeft(90);
             } else {
                 spark.turnRight(90);
             }
         }
 
-    }
-
-
-    /**
-     * Moves Spark nothing.
-     */
-    public void doNotMove() {
     }
 
     /**
@@ -208,8 +156,6 @@ public class Mover extends Robot {
 
         wallPoints.add(new double[]{spark.status.getX(), 0}); // nordliga väggen
         wallPoints.add(new double[]{spark.status.getX(), spark.getBattleFieldHeight()}); // sydliga väggen
-        //  wallPoints.add(new double[]{0, spark.status.getY()}); // västra väggen
-        //  wallPoints.add(new double[]{spark.getBattleFieldWidth(), spark.status.getY()}); // östra väggen
 
         return wallPoints;
     }
