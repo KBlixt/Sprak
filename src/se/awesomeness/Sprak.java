@@ -62,7 +62,7 @@ public class Sprak extends RateControlRobot {
 
             gunner.takeAim(fireSolution);
 
-            radarOp.monitor(target,turnsToFire);
+            radarOp.monitor(target,turnsToFire, getOthers());
 
             execute();
         }
