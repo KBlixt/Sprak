@@ -71,7 +71,7 @@ public class Sprak extends RateControlRobot {
     }
 
     private void shouldFire(Vector fireSolution, EnemyRobot target){
-        firing = gunner.isAligned(fireSolution) && turnsToFire <= 0 && fireSolution.getMagnitude() >= 1 && target.isTargetLocked();
+        firing = gunner.isAligned(fireSolution) && turnsToFire <= 0 && fireSolution.getMagnitude() >= 1 && target.isTargetLocked() && getEnergy() > fireSolution.getMagnitude();
         if (firing){
             System.out.println("firing bulletSize: " + fireSolution.getMagnitude());
         }
@@ -204,6 +204,13 @@ public class Sprak extends RateControlRobot {
         setGunRotationRate(gunner.getAdjustGunAngle());
         setRadarRotationRate(radarOp.getNextRadarTurn());
         if(firing){
+            if (gunner.getBulletPower() > 2.2){
+                setBulletColor(Color.RED);
+            }else if(gunner.getBulletPower() > 1.1) {
+                setBulletColor(Color.ORANGE);
+            }else{
+                setBulletColor(Color.GREEN);
+            }
             setFire(gunner.getBulletPower());
         }
         cleanUp();
