@@ -107,7 +107,7 @@ public class EnemyRobot {
         }
         Point newAvgPos = sumVectorPositions.divide(positionsToAverageOver).getPoint();
         Vector newAvgPosSpeed = averagePosition.vectorTo(newAvgPos).divide(infoAge);
-        averagePositionAcceleration = newAvgPosSpeed.subtract(averagePositionAcceleration).divide(infoAge);
+        averagePositionAcceleration = newAvgPosSpeed.subtract(averagePositionVelocity).divide(infoAge);
         averagePositionVelocity = newAvgPosSpeed;
         averagePosition = newAvgPos;
 
