@@ -43,10 +43,10 @@ public class Gunner {
         if (enemyVelocity.getMagnitude() < 0){
             enemyVelocity = enemyVelocity.negative();
         }
-        double timeLimitFactor = Math.max(Math.cos(Math.toRadians(targetPoint.vectorTo(nextPosition).angleToVector(enemyVelocity))),0);
+        double timeLimitFactor = Math.cos(Math.toRadians(targetPoint.vectorTo(nextPosition).angleToVector(enemyVelocity)));
         System.out.println("timeLimitFactor: " + timeLimitFactor);
 
-        double timeLimit = 15 + 10*timeLimitFactor + turnsToFire;
+        double timeLimit = 17 + 10*timeLimitFactor + turnsToFire;
 
         double distance = nextPosition.distanceTo(targetPoint);
         double addedTime = turnsToFire + distance/11;
