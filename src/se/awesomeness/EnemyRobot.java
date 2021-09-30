@@ -150,7 +150,7 @@ public class EnemyRobot {
 
     public int getClosestMatchingState(){
         int closestPointIndex = 0;
-        double closestDistance = 50;
+        double closestDistance = 38;
         for (int i = Math.max(pastVelocities.size()-140,0); i < pastVelocities.size()-30; i++){
             if (pastVelocities.get(i).subtract(velocity).getMagnitude() < 1.5){
                 double distance = position.distanceTo(pastPositions.get(i));
