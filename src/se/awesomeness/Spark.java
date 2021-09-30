@@ -22,7 +22,7 @@ public class Spark extends Robot {
 
     public void run() {
         mover = new Mover(this);
-        mover.moveToClosestWall(25);
+        mover.moveToClosestWall(60);
         mover.moveToMidPointOfQuadrant();
 
         //noinspection InfiniteLoopStatement
