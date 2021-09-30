@@ -50,7 +50,7 @@ public class Driver {
         }
 
         Vector forceFromGotHit = gotHitPosition.vectorTo(position);
-        weight = Math.max(Math.min(100/Math.sqrt(forceFromGotHit.getMagnitude()/100)-40 ,100),0);
+        weight = Math.max(Math.min(50/Math.sqrt(forceFromGotHit.getMagnitude()/50)-15 ,100),0);
         forces.add(forceFromGotHit.setMagnitude(weight));
 
 
@@ -59,24 +59,23 @@ public class Driver {
             randomPoint = new Point(rand.nextDouble()*wallWidth, rand.nextDouble()*wallHeight);
             turnsStandingStill = 5;
         }
-        forces.add(position.vectorTo(randomPoint).setMagnitude(Math.abs(25)));
+        //forces.add(position.vectorTo(randomPoint).setMagnitude(Math.abs(25)));
 
         //add forces from opponents.
         for (Map.Entry<String, EnemyRobot> entry : enemyRobots.entrySet()) {
             Vector forceFromEnemy = entry.getValue().estimatedPosition(12).vectorTo(position);
             weight = Math.max(Math.min(100/Math.sqrt(forceFromEnemy.getMagnitude()/100)-40 ,100),0);
             forces.add(forceFromEnemy.setMagnitude(weight));
-        }
 
-        //add forces from historic positions.
-        /*
-        for(int i = Math.max(pastPositions.size()-20, 0); i < pastPositions.size()-10; i++){
-            Vector forceFromPastPosition = pastPositions.get(i).vectorTo(position);
-            weight = Math.max(Math.min(6/Math.sqrt(forceFromPastPosition.getMagnitude()/6)-1.2 ,3),0);
-            forces.add(forceFromPastPosition.setMagnitude(weight));
-        }
+            forceFromEnemy = entry.getValue().estimatedPosition(0).vectorTo(position);
+            weight = Math.max(Math.min(100/Math.sqrt(forceFromEnemy.getMagnitude()/100)-40 ,100),0);
+            forces.add(forceFromEnemy.setMagnitude(weight));
 
-         */
+            forceFromEnemy =  position.vectorTo(entry.getValue().estimatedPosition(40));
+            weight = Math.max(Math.min(100/Math.sqrt(forceFromEnemy.getMagnitude()/100)-30 ,100),0);
+            forces.add(forceFromEnemy.setMagnitude(weight));
+        }
+        //add forces: want to be chased, don't want to be chasing them.
         //add force perpendicular to target.
         System.out.println(forces);
         Vector forceSum = Vector.addAll(forces);
@@ -84,50 +83,6 @@ public class Driver {
         Vector forceAfterWall = wallSurfing(forceSum);
         move(forceAfterWall);
     }
-
-    public void driveRandomly(){
-        double speed = velocity.getMagnitude();
-        Random rand = new Random();
-
-        double heading = velocity.getDirection();
-        List<Vector> forces = new ArrayList<>();
-        System.out.println("[-----------------------------------------------]");
-        System.out.println("speed: " + speed);
-        System.out.println("heading: " + heading);
-        System.out.println("position: " + position);
-        forces.add(velocity);
-        if(randomPoint == null || position.distanceTo(randomPoint) < 100){
-            randomPoint = new Point(rand.nextDouble()*wallWidth, rand.nextDouble()*wallHeight);
-        }
-        forces.add(position.vectorTo(randomPoint).setMagnitude(Math.abs(velocity.getMagnitude()+1)));
-        System.out.println(randomPoint);
-        System.out.println(forces);
-        Vector forceSum = Vector.addAll(forces);
-        System.out.println("forceSum: " + forceSum);
-
-        Vector forceAfterWall = wallSurfing(forceSum);
-        System.out.println("forceAfterWall: " + forceAfterWall);
-
-        move(forceAfterWall);
-    }
-
-    public void driveAntiGrav(){
-        List<Vector> forces = new ArrayList<>();
-
-        forces.add(velocity);
-
-        for (Map.Entry<String, EnemyRobot> entry : enemyRobots.entrySet()) {
-            forces.add(entry.getValue().estimatedPosition(0).vectorTo(position).setMagnitude(Math.abs(velocity.getMagnitude())*2));
-        }
-
-        Vector forceSum = Vector.addAll(forces);
-        Vector forceAfterWall = wallSurfing(forceSum);
-        move(forceAfterWall);
-    }
-
-
-
-
     private Vector wallSurfing(Vector force){
         if(force.getMagnitude()< 0){
             force = force.negative();
