@@ -215,8 +215,6 @@ public class EnemyRobot {
     }
 
     public boolean isStandingStill(){
-        System.out.println("avgPosVel: " + averagePositionVelocity.getMagnitude());
-        System.out.println("avgPosAcc: " + averagePositionAcceleration.getMagnitude());
         return pastPositions.size() > 50 && averagePositionVelocity.getMagnitude() < 1 && averagePositionAcceleration.getMagnitude() < 0.5;
                //&& (estimatedPosition(0).distanceTo(averagePosition) < averagePositionAverageDistance ||
                 //Math.sin(Math.toRadians(acceleration.angleToVector(estimatedPosition(0).vectorTo(averagePosition)))) < 90);
