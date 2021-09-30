@@ -150,13 +150,13 @@ public class Sprak extends RateControlRobot {
     public void onStatus(StatusEvent event) {
         super.onStatus(event);
         if(position.getX() == 0 && position.getY() == 0){
-            position.setPoint(getX(), getY());
+            position.set(getX(), getY());
         }
         pastPositions.add(new Point(position));
-        position.setPoint(getX(), getY());
-        normalVelocity.setVector(getVelocity(), Tools.convertAngle(getHeading()));
-        gunHeading.setVector(1,Tools.convertAngle(getGunHeading()));
-        radarHeading.setVector(1,Tools.convertAngle(getRadarHeading()));
+        position.set(getX(), getY());
+        normalVelocity.set(getVelocity(), Tools.convertAngle(getHeading()));
+        gunHeading.set(1,Tools.convertAngle(getGunHeading()));
+        radarHeading.set(1,Tools.convertAngle(getRadarHeading()));
         turnsToFire = (int)Math.round(Math.ceil(getGunHeat()/0.1));
         for (Map.Entry<String, EnemyRobot> robotEntry : enemyRobots.entrySet()) {
             robotEntry.getValue().updateThreatDistance(enemyRobots);
@@ -194,7 +194,7 @@ public class Sprak extends RateControlRobot {
         Point gotHitPosition2 = position.addVector(new Vector(36, addVector.getDirection()-90));
         List<Point> candidates = List.of(gotHitPosition1.addVector(normalVelocity.multiply(4)), gotHitPosition2.addVector(normalVelocity.multiply(4)));
         System.out.println(candidates);
-        gotHitPosition.setPoint(new Point(maxPoint.getX()/2, maxPoint.getY()/2).furthestPoint(candidates));
+        gotHitPosition.set(new Point(maxPoint.getX()/2, maxPoint.getY()/2).furthestPoint(candidates));
     }
 
     @Override

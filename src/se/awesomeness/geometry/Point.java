@@ -2,6 +2,7 @@ package se.awesomeness.geometry;
 
 import java.util.List;
 
+@SuppressWarnings({"UnusedReturnValue", "unused"})
 public class Point {
 
     private double x;
@@ -9,15 +10,15 @@ public class Point {
 
 
     public Point(double x, double y){
-        setPoint(x,y);
+        set(x,y);
     }
 
     public Point(Point point){
-        setPoint(point);
+        set(point);
     }
 
     public Point(Vector vector){
-        setPoint(vector);
+        set(vector);
     }
 
     public Point(){
@@ -26,26 +27,30 @@ public class Point {
     }
 
 
-    public void setPoint(double x, double y){
+    public Point set(double x, double y){
         this.x = x;
         this.y = y;
+        return this;
     }
 
-    public void setPoint(Point point){
+    public Point set(Point point){
         x = point.x;
         y = point.y;
+        return this;
     }
 
-    public void setPoint(Vector vector){
-        setPoint(vector.getPoint());
+    public Point set(Vector vector){
+        return set(vector.toPoint());
     }
 
-    public void setX(double x){
+    public Point setX(double x){
         this.x = x;
+        return this;
     }
 
-    public void setY(double y){
+    public Point setY(double y){
         this.y = y;
+        return this;
     }
 
 
@@ -57,11 +62,29 @@ public class Point {
         return y;
     }
 
+    public Vector toVector(){
+        return new Vector(this);
+    }
+
+
+    public Point addX(double x){
+        return new Point(this.x + x, y);
+    }
+    public Point addY(double y){
+        return new Point(x, this.y + y);
+    }
+    public Point subtractX(double x){
+        return addX(-x);
+    }
+    public Point subtractY(double y){
+        return addY(-y);
+    }
+
 
     public Point addVector(Vector vector){
         return new Point(
-                getX() + vector.getPoint().getX(),
-                getY() + vector.getPoint().getY());
+                getX() + vector.toPoint().getX(),
+                getY() + vector.toPoint().getY());
     }
 
     public Point subtractVector(Vector vector){

@@ -2,6 +2,7 @@ package se.awesomeness.geometry;
 
 import java.util.List;
 
+@SuppressWarnings({"UnusedReturnValue", "unused"})
 public class Vector {
 
     private double magnitude;
@@ -9,15 +10,15 @@ public class Vector {
 
 
     public Vector(double magnitude, double direction) {
-        setVector(magnitude, direction);
+        set(magnitude, direction);
     }
 
-    public Vector(Point freeForm){
-        setVector(freeForm);
+    public Vector(Point point){
+        set(point);
     }
 
     public Vector(Vector vector){
-        setVector(vector);
+        set(vector);
     }
 
     public Vector(){
@@ -26,15 +27,15 @@ public class Vector {
     }
 
 
-    public Vector setVector(double magnitude, double direction) {
+    public Vector set(double magnitude, double direction) {
         this.magnitude = magnitude;
         this.direction = Tools.shortestAngle(direction);
         return this;
     }
 
-    public Vector setVector(Point freeForm) {
-        double x = freeForm.getX();
-        double y = freeForm.getY();
+    public Vector set(Point point) {
+        double x = point.getX();
+        double y = point.getY();
 
         magnitude = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
         if (magnitude != 0) {
@@ -45,7 +46,7 @@ public class Vector {
         return this;
     }
 
-    public Vector setVector(Vector vector){
+    public Vector set(Vector vector){
         magnitude = vector.magnitude;
         direction = vector.direction;
         return this;
@@ -62,16 +63,16 @@ public class Vector {
     }
 
     public Vector setX(double x){
-        Point newFreeform = getPoint();
-        newFreeform.setX(x);
-        setVector(newFreeform);
+        Point point = toPoint();
+        point.setX(x);
+        set(point);
         return this;
     }
 
     public Vector setY(double y){
-        Point newFreeform = getPoint();
+        Point newFreeform = toPoint();
         newFreeform.setY(y);
-        setVector(newFreeform);
+        set(newFreeform);
         return this;
     }
 
@@ -92,14 +93,14 @@ public class Vector {
         return magnitude * Math.sin(Math.toRadians(direction));
     }
 
-    public Point getPoint() {
+    public Point toPoint() {
         return new Point(getX(),getY());
     }
 
 
     public Vector add(Vector vector){
-        Point vectorPoint = getPoint();
-        Point vectorAddPoint = vector.getPoint();
+        Point vectorPoint = toPoint();
+        Point vectorAddPoint = vector.toPoint();
 
         return new Vector( new Point(
                 vectorPoint.getX() + vectorAddPoint.getX(),
@@ -120,18 +121,35 @@ public class Vector {
 
     public Vector divide(double denominator){
         if(denominator == 0){
-            denominator = 0.000001;
+            denominator = 1/Double.MAX_VALUE;
         }
         return new Vector(magnitude/denominator, direction);
     }
 
-    public double angleToPoint(Point toPoint){
-        Vector toPointVector = new Vector(toPoint);
+    public Vector addMagnitude(double magnitude){
+        return new Vector(this.magnitude + magnitude, direction);
+    }
+
+    public Vector addDirection(double direction){
+        return new Vector(magnitude, this.direction + direction);
+    }
+
+    public Vector subtractMagnitude(double magnitude){
+        return addMagnitude(-magnitude);
+    }
+
+    public Vector subtractDirection(double direction){
+        return addDirection(-direction);
+    }
+
+
+    public double angleToPoint(Point point){
+        Vector toPointVector = new Vector(point);
         return angleToVector(toPointVector);
     }
 
-    public double angleToVector(Vector toVector){
-        double angle = toVector.getDirection() - direction;
+    public double angleToVector(Vector vector){
+        double angle = vector.getDirection() - direction;
         return Tools.shortestAngle(angle);
     }
 

@@ -124,7 +124,7 @@ public class Driver {
             pointsOnWall.add(new Point(-x, distToWallY));
         }
         System.out.println(pointsOnWall);
-        pointsOnWall.add(force.getPoint());
+        pointsOnWall.add(force.toPoint());
         pointsOnWall.add(new Point(new Vector(magnitude, 0)));
         pointsOnWall.add(new Point(new Vector(magnitude, 90)));
         pointsOnWall.add(new Point(new Vector(magnitude, 180)));
@@ -134,7 +134,7 @@ public class Driver {
         Point candidatePoint = new Point();
         while (!withinLimits) {
             if (!pointsOnWall.isEmpty()) {
-                candidatePoint = force.getPoint().closestPoint(pointsOnWall);
+                candidatePoint = force.toPoint().closestPoint(pointsOnWall);
                 pointsOnWall.remove(candidatePoint);
             }else{
                 List<Point> edges = List.of(
@@ -212,7 +212,7 @@ public class Driver {
         candidatePoints.add(new Point(new Vector(lowerSpeedLimit, rightTurnLimit)));
 
         Vector zeroOffset = new Vector((upperSpeedLimit + lowerSpeedLimit)/2, (leftTurnLimit + rightTurnLimit)/2);
-        double circleProjectionRadius = zeroOffset.getPoint().furthestPoint(candidatePoints).distanceTo(zeroOffset.getPoint());
+        double circleProjectionRadius = zeroOffset.toPoint().furthestPoint(candidatePoints).distanceTo(zeroOffset.toPoint());
         double largestTurnLimit = Math.max(Math.abs(leftTurnLimit), Math.abs(rightTurnLimit));
         double distanceToUpperLineProjection = Math.cos(Math.toRadians(largestTurnLimit))*upperSpeedLimit;
         double distanceToLowerLineProjection = Math.cos(Math.toRadians(largestTurnLimit))*lowerSpeedLimit;
@@ -228,7 +228,7 @@ public class Driver {
         Vector forceLineProjection = new Vector(forceLineProjectionDistance, force.getDirection());
         Vector zeroToForceLineProjection = forceLineProjection.subtract(zeroOffset);
         Vector forceCircleProjection = new Vector(circleProjectionRadius, zeroToForceLineProjection.getDirection());
-        Point targetPoint = forceCircleProjection.add(zeroOffset).getPoint();
+        Point targetPoint = forceCircleProjection.add(zeroOffset).toPoint();
 
         for (Limit limit : limits) {
             candidatePoints.add(limit.closestPoint(targetPoint));
