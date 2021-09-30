@@ -8,6 +8,7 @@ import se.awesomeness.crew.Driver;
 import se.awesomeness.crew.RadarOperator;
 import se.awesomeness.crew.Gunner;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,15 +45,18 @@ public class Sprak extends RateControlRobot {
         Vector fireSolution = new Vector();
         while (getOthers() > 0) {
             printDiagnostics();
-            shouldFire(fireSolution);
-            if (turnsToFire > 6 || target == null || deadRobots.contains(target.getName()) || fireSolution.getMagnitude() < 1) {
-                target = selectTarget();
-            }
+            shouldFire(fireSolution, target);
 
             driver.drive();
             nextPosition = driver.getNextPosition();
 
             gunner.updateInfo(nextPosition, turnsToFire);
+
+            if (turnsToFire > 6 || target == null || deadRobots.contains(target.getName()) || fireSolution.getMagnitude() < 1) {
+                target = selectTarget();
+            }
+
+
             fireSolution = gunner.findFireSolution(target);
             System.out.println("fireSolution: " + fireSolution);
 
@@ -66,18 +70,21 @@ public class Sprak extends RateControlRobot {
         endOfRoundAction();
     }
 
-    private void shouldFire(Vector fireSolution){
-        firing = gunner.isAligned(fireSolution) && turnsToFire <= 0 && fireSolution.getMagnitude() >= 1;
+    private void shouldFire(Vector fireSolution, EnemyRobot target){
+        firing = gunner.isAligned(fireSolution) && turnsToFire <= 0 && fireSolution.getMagnitude() >= 1 && target.isTargetLocked();
+        if (firing){
+            System.out.println("firing bulletSize: " + fireSolution.getMagnitude());
+        }
     }
+
     private EnemyRobot selectTarget(){
         EnemyRobot target = null;
-        double shortestDistance = -1;
+        double biggestBullet = -1;
         for (Map.Entry<String, EnemyRobot> entry : enemyRobots.entrySet()) {
             EnemyRobot enemyRobot = entry.getValue();
-            Point enemyPosition = enemyRobot.estimatedPosition(turnsToFire);
-            double distance = position.distanceTo(enemyPosition);
-            if ( distance < shortestDistance || shortestDistance == -1){
-                shortestDistance = distance;
+            double bulletPower = gunner.findFireSolution(enemyRobot).getMagnitude();
+            if ( bulletPower > biggestBullet || biggestBullet == -1){
+                biggestBullet = bulletPower;
                 target = enemyRobot;
             }
         }
@@ -91,6 +98,9 @@ public class Sprak extends RateControlRobot {
         minPoint.setY(18);
         maxPoint.setX(getBattleFieldWidth()-18);
         maxPoint.setY(getBattleFieldHeight()-18);
+
+        setColors(Color.DARK_GRAY, Color.GREEN, Color.YELLOW);
+        setBulletColor(Color.GREEN);
 
         driver = new Driver(
                 position,
@@ -180,8 +190,11 @@ public class Sprak extends RateControlRobot {
     public void onHitByBullet(HitByBulletEvent event) {
         super.onHitByBullet(event);
         Vector addVector = position.vectorTo(enemyRobots.get(event.getName()).estimatedPosition(0));
-        gotHitPosition.setPoint(position.addVector(addVector.setDirection(addVector.getDirection()+90).setMagnitude(normalVelocity.getMagnitude()*3)));
-
+        Point gotHitPosition1 = position.addVector(new Vector(36, addVector.getDirection()+90));
+        Point gotHitPosition2 = position.addVector(new Vector(36, addVector.getDirection()-90));
+        List<Point> candidates = List.of(gotHitPosition1.addVector(normalVelocity.multiply(4)), gotHitPosition2.addVector(normalVelocity.multiply(4)));
+        System.out.println(candidates);
+        gotHitPosition.setPoint(new Point(maxPoint.getX()/2, maxPoint.getY()/2).furthestPoint(candidates));
     }
 
     @Override
@@ -204,20 +217,6 @@ public class Sprak extends RateControlRobot {
     }
 
     public void printDiagnostics(){
-        /*
-            private final Point position = new Point();
-    private final Vector normalVelocity = new Vector();
-    private final Map<String, EnemyRobot> enemyRobots = new HashMap<>();
-    private final List<String> deadRobots = new ArrayList<>();
-    private final Vector gunHeading = new Vector();
-    private final Vector radarHeading = new Vector();
-    private final Point maxPoint = new Point();
-    private final Point minPoint = new Point();
-
-
-    int turnsToFire = 16;
-    boolean firing;
-         */
         System.out.println();
         System.out.println("[------------------------------------------------------------------]");
         System.out.println("[---------------------------------------------------------------------------]");
@@ -228,6 +227,8 @@ public class Sprak extends RateControlRobot {
         System.out.println("turnsToFire: " + turnsToFire);
         System.out.println("firing: " + firing);
         System.out.println("wallHits: " + wallHits);
+        System.out.println("gotHitPosition: " + gotHitPosition);
+
         System.out.println();
         System.out.println("[vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv]");
 
