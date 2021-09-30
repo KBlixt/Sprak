@@ -18,10 +18,10 @@ public class RadarOperator {
         this.radarHeading = radarHeading;
     }
 
-    public void monitor(EnemyRobot target, int turnsToFire){
+    public void monitor(EnemyRobot target, int turnsToFire, int enemiesLeft){
         nextAction--;
         if (nextAction==0){
-            if (turnsToFire>10){
+            if (turnsToFire>10 && enemiesLeft>1){
                 nextRadarTurn = 75;
                 nextAction = 8;
             }else{
