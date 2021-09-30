@@ -4,10 +4,6 @@ import se.awesomeness.EnemyRobot;
 import se.awesomeness.geometry.Point;
 import se.awesomeness.geometry.Vector;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class Gunner {
 
     private final Vector gunHeading;
@@ -35,17 +31,31 @@ public class Gunner {
     }
 
     public Vector findFireSolution(EnemyRobot target){
-        double timeLimit = 20 + turnsToFire;
+        System.out.println("debug: " + target.isStandingStill());
+        int offset = 0;
+        if (target.isStandingStill()) {
+            offset = target.getClosestMatchingState();
+        }
+        System.out.println("offset: " + offset);
 
-        Point targetPoint = target.getPosition();
+        Point targetPoint = target.estimatedPosition(offset);
+        Vector enemyVelocity = target.estimatedVelocity(turnsToFire+ offset);
+        if (enemyVelocity.getMagnitude() < 0){
+            enemyVelocity = enemyVelocity.negative();
+        }
+        double timeLimitFactor = Math.sin(Math.toRadians(nextPosition.vectorTo(targetPoint).angleToVector(enemyVelocity)));
+        double timeLimit = 15 + 10*timeLimitFactor + turnsToFire;
+
         double distance = nextPosition.distanceTo(targetPoint);
         double addedTime = turnsToFire + distance/11;
         double bulletSpeed = 11;
         int iter = 10;
         while(iter>0){
-            targetPoint = target.estimatedPosition((int)Math.round(addedTime));
+            targetPoint = target.estimatedPosition((int)Math.round(addedTime + offset));
             distance = nextPosition.distanceTo(targetPoint);
             addedTime = distance/bulletSpeed + turnsToFire;
+            System.out.println("addedTime: " + addedTime);
+
             if (addedTime > timeLimit && bulletSpeed < 17){
                 bulletSpeed *= addedTime/timeLimit;
                 addedTime = timeLimit;
@@ -70,41 +80,10 @@ public class Gunner {
         return new Vector(-(bulletSpeed-20)/3,vectorToTarget.getDirection());
     }
 
-    public Vector findFireSolutionAverageLocation(EnemyRobot target){
-        ArrayList<Point> pastPositions = target.getPastPositions();
-        int size = pastPositions.size();
-        if (size<130){
-            return new Vector();
-        }
-        Vector sumVectorPositions = new Vector();
-        for (int i = size-110; i < size; i++){
-            sumVectorPositions = sumVectorPositions.add(new Vector(pastPositions.get(i)));
-        }
-        Point avgPos = sumVectorPositions.divide(110).getPoint();
-
-        sumVectorPositions = new Vector();
-        for (int i = size-120; i < size-10; i++){
-            sumVectorPositions = sumVectorPositions.add(new Vector(pastPositions.get(i)));
-        }
-        Point averagePosition2 = sumVectorPositions.divide(110).getPoint();
-        Vector avgPosSpeed = averagePosition2.vectorTo(avgPos).divide(10);
-
-        sumVectorPositions = new Vector();
-        for (int i = size-130; i < size-20; i++){
-            sumVectorPositions = sumVectorPositions.add(new Vector(pastPositions.get(i)));
-        }
-        Point averagePosition3 = sumVectorPositions.divide(110).getPoint();
-        Vector avgPosSpeed2 = averagePosition3.vectorTo(averagePosition2).divide(10);
-        Vector avgPosAcc = avgPosSpeed.subtract(avgPosSpeed2).divide(10);
-
-        Vector vectorToTargetPoint = nextPosition.vectorTo(target.estimatedPosition(2));
-        vectorToTargetPoint.setMagnitude(3);
-        return vectorToTargetPoint;
-    }
-
     public boolean isAligned(Vector fireSolution){
         return gunHeading.angleToVector(fireSolution) <= 0.00001 && gunHeading.angleToVector(fireSolution) >= -0.00001;
     }
+
     public double getAdjustGunAngle(){
         return -adjustGunAngle;
     }
