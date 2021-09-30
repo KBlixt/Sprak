@@ -32,13 +32,15 @@ public class Gunner {
 
     public Vector findFireSolution(EnemyRobot target){
         System.out.println("debug: " + target.isStandingStill());
+        Vector matchedStateOffset = new Vector();
         int offset = 0;
         if (target.isStandingStill()) {
             offset = target.getClosestMatchingState();
+            matchedStateOffset = target.getMatchedStateOffset();
         }
         System.out.println("offset: " + offset);
 
-        Point targetPoint = target.estimatedPosition(offset);
+        Point targetPoint = target.estimatedPosition(offset).addVector(matchedStateOffset);
         Vector enemyVelocity = target.estimatedVelocity(turnsToFire+ offset);
         if (enemyVelocity.getMagnitude() < 0){
             enemyVelocity = enemyVelocity.negative();
@@ -53,7 +55,7 @@ public class Gunner {
         double bulletSpeed = 11;
         int iter = 10;
         while(iter>0){
-            targetPoint = target.estimatedPosition((int)Math.round(addedTime + offset));
+            targetPoint = target.estimatedPosition((int)Math.round(addedTime + offset)).addVector(matchedStateOffset);
             distance = nextPosition.distanceTo(targetPoint);
             addedTime = distance/bulletSpeed + turnsToFire;
 

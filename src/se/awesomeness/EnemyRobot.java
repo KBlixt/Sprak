@@ -14,6 +14,7 @@ public class EnemyRobot {
     private double energy;
     private int infoAge;
     private boolean targetLocked;
+    private Vector matchedStateOffset;
 
     private Point position;
     private Vector velocity;
@@ -149,8 +150,9 @@ public class EnemyRobot {
     }
 
     public int getClosestMatchingState(){
+        matchedStateOffset = new Vector();
         int closestPointIndex = 0;
-        double closestDistance = 38;
+        double closestDistance = 50;
         for (int i = Math.max(pastVelocities.size()-140,0); i < pastVelocities.size()-30; i++){
             if (pastVelocities.get(i).subtract(velocity).getMagnitude() < 1.5){
                 double distance = position.distanceTo(pastPositions.get(i));
@@ -160,8 +162,12 @@ public class EnemyRobot {
                 }
             }
         }
+        matchedStateOffset = pastPositions.get(closestPointIndex).vectorTo(position);
         return closestPointIndex - pastVelocities.size();
+    }
 
+    public Vector getMatchedStateOffset(){
+        return matchedStateOffset;
     }
 
     public double getEnergy(){
@@ -185,7 +191,6 @@ public class EnemyRobot {
     }
 
     public Point estimatedPosition(int time){
-        //if time+infoAge<
         if (time+infoAge<0){
             return pastPositions.get(pastPositions.size()+(time+infoAge));
         }
@@ -215,7 +220,9 @@ public class EnemyRobot {
     }
 
     public boolean isStandingStill(){
-        return pastPositions.size() > 50 && averagePositionVelocity.getMagnitude() < 0.5 && averagePositionAcceleration.getMagnitude() < 0.3;
+        System.out.println(averagePositionVelocity);
+        System.out.println(averagePositionAcceleration);
+        return pastPositions.size() > 50 && averagePositionVelocity.getMagnitude() < 1 && averagePositionAcceleration.getMagnitude() < 0.3;
                //&& (estimatedPosition(0).distanceTo(averagePosition) < averagePositionAverageDistance ||
                 //Math.sin(Math.toRadians(acceleration.angleToVector(estimatedPosition(0).vectorTo(averagePosition)))) < 90);
     }
