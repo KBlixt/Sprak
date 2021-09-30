@@ -44,7 +44,7 @@ public class Driver {
         double weight;
 
         if (Math.abs(velocity.getMagnitude()) < 2){
-            turnsStandingStill++;
+            turnsStandingStill = Math.min(turnsStandingStill+1, 20);
         }else{
             turnsStandingStill = Math.max(turnsStandingStill-1, 0);
         }
@@ -53,13 +53,15 @@ public class Driver {
         weight = Math.max(Math.min(50/Math.sqrt(forceFromGotHit.getMagnitude()/50)-15 ,100),0);
         forces.add(forceFromGotHit.setMagnitude(weight));
 
-
         //add force toward random point
-        if(randomPoint == null || position.distanceTo(randomPoint) < 100 || turnsStandingStill > 20){
+        if((randomPoint == null || position.distanceTo(randomPoint) < 100) && turnsStandingStill > 7){
             randomPoint = new Point(rand.nextDouble()*wallWidth, rand.nextDouble()*wallHeight);
-            turnsStandingStill = 5;
+        }else if (turnsStandingStill <= 0){
+            randomPoint = null;
         }
-        //forces.add(position.vectorTo(randomPoint).setMagnitude(Math.abs(25)));
+        if (randomPoint != null){
+            forces.add(position.vectorTo(randomPoint).setMagnitude(Math.abs(25)));
+        }
 
         //add forces from opponents.
         for (Map.Entry<String, EnemyRobot> entry : enemyRobots.entrySet()) {
