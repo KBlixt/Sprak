@@ -1,4 +1,4 @@
-package se.awesomeness.geometry;
+package se.awesomeness.forceTranslator;
 
 public enum LimitType {
     TURN_RIGHT_LIMIT,

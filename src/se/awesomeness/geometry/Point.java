@@ -70,16 +70,18 @@ public class Point {
     public Point addX(double x){
         return new Point(this.x + x, y);
     }
+
     public Point addY(double y){
         return new Point(x, this.y + y);
     }
+
     public Point subtractX(double x){
         return addX(-x);
     }
+
     public Point subtractY(double y){
         return addY(-y);
     }
-
 
     public Point addVector(Vector vector){
         return new Point(

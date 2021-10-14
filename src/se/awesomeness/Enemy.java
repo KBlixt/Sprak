@@ -8,7 +8,7 @@ import se.awesomeness.geometry.Vector;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class EnemyRobot {
+public class Enemy {
 
     private final String name;
     private double energy;
@@ -32,20 +32,15 @@ public class EnemyRobot {
     private final ArrayList<Vector> estimatedVelocities = new ArrayList<>();
     private final ArrayList<Point>  pastPositions= new ArrayList<>();
     private final ArrayList<Vector>  pastVelocities= new ArrayList<>();
-    private final double maxX;
-    private final double maxY;
-    private final double minX;
-    private final double minY;
+
+    private static Battlefield battlefield; //static?
 
 
 
 
 
-    public EnemyRobot(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading, Point minPoint, Point maxPoint){
-        minX = minPoint.getX()+10;
-        minY = minPoint.getY()+10;
-        maxX = maxPoint.getX()-10;
-        maxY = maxPoint.getY()-10;
+
+    public Enemy(ScannedRobotEvent scannedRobot, Point sparkPosition, double sparkHeading){
         name = scannedRobot.getName();
         threatDistance = -1;
 
@@ -121,16 +116,16 @@ public class EnemyRobot {
         threatInfoAge++;
     }
 
-    public void updateThreatDistance(Map<String, EnemyRobot> enemyRobots) {
+    public void updateThreatDistance(Map<String, Enemy> enemyRobots) {
         double shortestDistance = 600;
 
-        for (Map.Entry<String, EnemyRobot> robotEntry : enemyRobots.entrySet()) {
+        for (Map.Entry<String, Enemy> robotEntry : enemyRobots.entrySet()) {
 
             if (robotEntry.getValue().getName().equals(name)){
                 continue;
             }
 
-            double distance = estimatedPosition(0).distanceTo(robotEntry.getValue().estimatedPosition(0));
+            double distance = getPosition(0).distanceTo(robotEntry.getValue().getPosition(0));
             if (distance < shortestDistance){
                 shortestDistance = distance;
             }
@@ -182,35 +177,31 @@ public class EnemyRobot {
         return threatDistanceSpeed;
     }
 
-    public Point getPosition(){
-        return position;
-    }
-
     public boolean isTargetLocked(){
         return targetLocked && infoAge <= 1;
     }
 
-    public Point estimatedPosition(int time){
+    public Point getPosition(int time){
         if (time+infoAge<0){
             return pastPositions.get(pastPositions.size()+(time+infoAge));
         }
         if (estimatedPositions.size() <= time+infoAge){
-            Point newEstimatedPosition = estimatedPosition(time-1).addVector(estimatedVelocity(time-1));
-            if (newEstimatedPosition.getX() < minX) newEstimatedPosition.setX(minX);
-            if (newEstimatedPosition.getY() < minY) newEstimatedPosition.setY(minY);
-            if (newEstimatedPosition.getX() > maxX) newEstimatedPosition.setX(maxX);
-            if (newEstimatedPosition.getY() > maxY) newEstimatedPosition.setY(maxY);
+            Point newEstimatedPosition = getPosition(time-1).addVector(getVelocity(time-1));
+            if (newEstimatedPosition.getX() < battlefield.minX) newEstimatedPosition.setX(battlefield.minX);
+            if (newEstimatedPosition.getY() < battlefield.minY) newEstimatedPosition.setY(battlefield.minY);
+            if (newEstimatedPosition.getX() > battlefield.maxX) newEstimatedPosition.setX(battlefield.maxX);
+            if (newEstimatedPosition.getY() > battlefield.maxY) newEstimatedPosition.setY(battlefield.maxY);
             estimatedPositions.add(newEstimatedPosition);
         }
         return estimatedPositions.get(time+infoAge);
     }
 
-    public Vector estimatedVelocity(int time){
+    public Vector getVelocity(int time){
         if (time+infoAge<0){
             return pastVelocities.get(pastPositions.size()+(time+infoAge));
         }
         if (estimatedVelocities.size() <= time+infoAge){
-            Vector newEstimatedVelocity = estimatedVelocity(time-1).add(acceleration);
+            Vector newEstimatedVelocity = getVelocity(time-1).add(acceleration);
             if (newEstimatedVelocity.getMagnitude() > 8){
                 newEstimatedVelocity.setMagnitude(8);
             }
@@ -236,5 +227,9 @@ public class EnemyRobot {
         out += "Upd : " + infoAge + "\n";
         return out;
 
+    }
+
+    public static void setBattlefield(Battlefield battlefield){
+        Enemy.battlefield = battlefield;
     }
 }

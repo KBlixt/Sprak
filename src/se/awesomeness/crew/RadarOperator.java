@@ -1,6 +1,6 @@
 package se.awesomeness.crew;
 
-import se.awesomeness.EnemyRobot;
+import se.awesomeness.Enemy;
 import se.awesomeness.geometry.Point;
 import se.awesomeness.geometry.Vector;
 
@@ -18,7 +18,7 @@ public class RadarOperator {
         this.radarHeading = radarHeading;
     }
 
-    public void monitor(EnemyRobot target, int turnsToFire, int enemiesLeft){
+    public void monitor(Enemy target, int turnsToFire, int enemiesLeft){
         nextAction--;
         if (nextAction==0){
             if (turnsToFire>10 && enemiesLeft>1){
@@ -31,8 +31,8 @@ public class RadarOperator {
         }
     }
 
-    public void robotMonitoring(EnemyRobot target){
-        Point targetPosition = target.estimatedPosition(1);
+    public void robotMonitoring(Enemy target){
+        Point targetPosition = target.getPosition(1);
         double radarBearingToTarget = radarHeading.angleToVector(position.vectorTo(targetPosition));
         System.out.println("radarBearingToTarget: " + radarBearingToTarget);
         if (radarBearingToTarget >= 0){

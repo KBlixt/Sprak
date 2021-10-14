@@ -1,6 +1,6 @@
 package se.awesomeness.crew;
 
-import se.awesomeness.EnemyRobot;
+import se.awesomeness.Enemy;
 import se.awesomeness.geometry.Point;
 import se.awesomeness.geometry.Vector;
 
@@ -30,7 +30,8 @@ public class Gunner {
         this.nextPosition = nextPosition;
     }
 
-    public Vector findFireSolution(EnemyRobot target){
+    //todo: adjust for sprak movement.
+    public Vector findFireSolution(Enemy target){
         System.out.println("debug: " + target.isStandingStill());
         Vector matchedStateOffset = new Vector();
         int offset = 0;
@@ -40,8 +41,8 @@ public class Gunner {
         }
         System.out.println("offset: " + offset);
 
-        Point targetPoint = target.estimatedPosition(offset).addVector(matchedStateOffset);
-        Vector enemyVelocity = target.estimatedVelocity(turnsToFire+ offset);
+        Point targetPoint = target.getPosition(offset).addVector(matchedStateOffset);
+        Vector enemyVelocity = target.getVelocity(turnsToFire+ offset);
         if (enemyVelocity.getMagnitude() < 0){
             enemyVelocity = enemyVelocity.negative();
         }
@@ -55,7 +56,7 @@ public class Gunner {
         double bulletSpeed = 11;
         int iter = 10;
         while(iter>0){
-            targetPoint = target.estimatedPosition((int)Math.round(addedTime + offset)).addVector(matchedStateOffset);
+            targetPoint = target.getPosition((int)Math.round(addedTime + offset)).addVector(matchedStateOffset);
             distance = nextPosition.distanceTo(targetPoint);
             addedTime = distance/bulletSpeed + turnsToFire;
 

@@ -1,4 +1,8 @@
-package se.awesomeness.geometry;
+package se.awesomeness.forceTranslator;
+
+import se.awesomeness.geometry.Point;
+import se.awesomeness.geometry.Tools;
+import se.awesomeness.geometry.Vector;
 
 public record Limit(LimitType type, double limit) {
 
@@ -22,8 +26,6 @@ public record Limit(LimitType type, double limit) {
                 double adjustVectorDirection = limit - 90;
                 closestPoint =  pointVector.add(new Vector(adjustVectorMagnitude, adjustVectorDirection)).toPoint();
             }
-            default ->
-                    System.out.println("<ERROR> no type match in switch in Function.closestPoint. type: " + type.name());
         }
         return closestPoint;
     }
@@ -36,8 +38,8 @@ public record Limit(LimitType type, double limit) {
             magnitude *= -1;
             direction = Tools.oppositeAngle(direction);
         }
-        boolean xIsPositiv = direction <= 90 && direction >= -90;
 
+        boolean xIsPositiv = direction <= 90 && direction >= -90;
         double margin = 0.000000001;
         boolean withinLimit = false;
         switch (type) {

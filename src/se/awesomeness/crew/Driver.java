@@ -1,40 +1,36 @@
 package se.awesomeness.crew;
 
-import se.awesomeness.EnemyRobot;
+import se.awesomeness.Battlefield;
+import se.awesomeness.Enemy;
+import se.awesomeness.forceTranslator.ForceTranslator;
 import se.awesomeness.geometry.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 public class Driver {
 
     private final Point position;
     private final Vector velocity;
-    private final double wallHeight;
-    private final double wallWidth;
-    private final Map<String, EnemyRobot> enemyRobots;
     private final ArrayList<Point> pastPositions;
     private final Point gotHitPosition;
 
-    private Point nextPosition;
-    private double nextSpeed;
-    private double nextTurn;
+    private final Battlefield battlefield;
+
+    private Vector moveCommand;
     private Point randomPoint = null;
     private int turnsStandingStill;
 
 
 
 
-    public Driver(Point position, Vector velocity, Map<String, EnemyRobot> enemyRobots, ArrayList<Point> pastPositions, Point gotHitPosition, double wallWidth, double wallHeight) {
+    public Driver(Point position, Vector velocity, ArrayList<Point> pastPositions, Point gotHitPosition, Battlefield battlefield) {
         this.position = position;
         this.velocity = velocity;
-        this.enemyRobots = enemyRobots;
         this.pastPositions = pastPositions;
         this.gotHitPosition = gotHitPosition;
-        this.wallWidth = wallWidth;
-        this.wallHeight = wallHeight;
+        this.battlefield = battlefield;
         turnsStandingStill = 0;
     }
 
@@ -55,7 +51,7 @@ public class Driver {
 
         //add force toward random point
         if((randomPoint == null || position.distanceTo(randomPoint) < 100) && turnsStandingStill > 7){
-            randomPoint = new Point(rand.nextDouble()*wallWidth, rand.nextDouble()*wallHeight);
+            randomPoint = new Point(rand.nextDouble()*battlefield.maxX, rand.nextDouble()*battlefield.maxY);
         }else if (turnsStandingStill <= 0){
             randomPoint = null;
         }
@@ -64,16 +60,17 @@ public class Driver {
         }
 
         //add forces from opponents.
-        for (Map.Entry<String, EnemyRobot> entry : enemyRobots.entrySet()) {
-            Vector forceFromEnemy = entry.getValue().estimatedPosition(12).vectorTo(position);
+        for (String enemyName : battlefield.getEnemies()) {
+            Enemy enemy = battlefield.getEnemy(enemyName);
+            Vector forceFromEnemy = enemy.getPosition(12).vectorTo(position);
             weight = Math.max(Math.min(100/Math.sqrt(forceFromEnemy.getMagnitude()/100)-40 ,100),0);
             forces.add(forceFromEnemy.setMagnitude(weight));
 
-            forceFromEnemy = entry.getValue().estimatedPosition(0).vectorTo(position);
+            forceFromEnemy = enemy.getPosition(0).vectorTo(position);
             weight = Math.max(Math.min(100/Math.sqrt(forceFromEnemy.getMagnitude()/100)-40 ,100),0);
             forces.add(forceFromEnemy.setMagnitude(weight));
 
-            forceFromEnemy =  position.vectorTo(entry.getValue().estimatedPosition(40));
+            forceFromEnemy =  position.vectorTo(enemy.getPosition(40));
             weight = Math.max(Math.min(100/Math.sqrt(forceFromEnemy.getMagnitude()/100)-30 ,100),0);
             forces.add(forceFromEnemy.setMagnitude(weight));
         }
@@ -83,8 +80,10 @@ public class Driver {
         Vector forceSum = Vector.addAll(forces);
         System.out.println("forceSum: " + forceSum);
         Vector forceAfterWall = wallSurfing(forceSum);
-        move(forceAfterWall);
+
+        moveCommand = ForceTranslator.translateForce(forceAfterWall,velocity);
     }
+
     private Vector wallSurfing(Vector force){
         if(force.getMagnitude()< 0){
             force = force.negative();
@@ -92,10 +91,10 @@ public class Driver {
 
         double sprakX = position.getX();
         double sprakY = position.getY();
-        double minX = 19.5;
-        double minY = 19.5;
-        double maxX = wallWidth - 19.5;
-        double maxY = wallHeight - 19.5;
+        double minX = battlefield.minX + 1.5;
+        double minY = battlefield.minY + 1.5;
+        double maxX = battlefield.maxX - 1.5;
+        double maxY = battlefield.maxY - 1.5;
         double magnitude = calculateLookAhead((minX + maxX)/2, (minY+maxY)/2);
         force = new Vector(magnitude,force.getDirection());
 
@@ -185,90 +184,33 @@ public class Driver {
         return (magnitudePartX+magnitudePartY+10)*(Math.abs(velocity.getMagnitude())/8) + 4;
     }
 
-    private void move(Vector force){
-        double speed = velocity.getMagnitude();
-        double heading = velocity.getDirection();
-        if (force.getMagnitude() < 0){
-            force = force.negative();
-        }
-        force = new Vector(force.getMagnitude(), force.getDirection() - heading);
-
-        double upperSpeedLimit = speed + Math.min(2, Math.max(-speed, Math.min(1, -speed + 8)));
-        double lowerSpeedLimit = speed + Math.max(-8 - speed, Math.min(-1, Math.max(-2, -speed)));
-        double leftTurnLimit = 10 - 0.75 * Math.abs(speed);
-        double rightTurnLimit = -leftTurnLimit;
-
-        List<Limit> limits = List.of(
-                new Limit(LimitType.ACCELERATE_LIMIT, upperSpeedLimit),
-                new Limit(LimitType.DECELERATE_LIMIT, lowerSpeedLimit),
-                new Limit(LimitType.TURN_LEFT_LIMIT, leftTurnLimit),
-                new Limit(LimitType.TURN_RIGHT_LIMIT, rightTurnLimit)
-        );
-
-        List<Point> candidatePoints = new ArrayList<>();
-        candidatePoints.add(new Point(new Vector(upperSpeedLimit, leftTurnLimit)));
-        candidatePoints.add(new Point(new Vector(upperSpeedLimit, rightTurnLimit)));
-        candidatePoints.add(new Point(new Vector(lowerSpeedLimit, leftTurnLimit)));
-        candidatePoints.add(new Point(new Vector(lowerSpeedLimit, rightTurnLimit)));
-
-        Vector zeroOffset = new Vector((upperSpeedLimit + lowerSpeedLimit)/2, (leftTurnLimit + rightTurnLimit)/2);
-        double circleProjectionRadius = zeroOffset.toPoint().furthestPoint(candidatePoints).distanceTo(zeroOffset.toPoint());
-        double largestTurnLimit = Math.max(Math.abs(leftTurnLimit), Math.abs(rightTurnLimit));
-        double distanceToUpperLineProjection = Math.cos(Math.toRadians(largestTurnLimit))*upperSpeedLimit;
-        double distanceToLowerLineProjection = Math.cos(Math.toRadians(largestTurnLimit))*lowerSpeedLimit;
-
-        double forceLineProjectionDistance;
-        if (force.getDirection()< 90 && force.getDirection() > -90){
-            forceLineProjectionDistance = distanceToUpperLineProjection/Math.cos(Math.toRadians(force.getDirection()));
-        }else if (force.getDirection()> 90 || force.getDirection() < -90){
-            forceLineProjectionDistance = distanceToLowerLineProjection/Math.cos(Math.toRadians(force.getDirection()));
-        }else{
-            forceLineProjectionDistance = Double.MAX_VALUE;
-        }
-        Vector forceLineProjection = new Vector(forceLineProjectionDistance, force.getDirection());
-        Vector zeroToForceLineProjection = forceLineProjection.subtract(zeroOffset);
-        Vector forceCircleProjection = new Vector(circleProjectionRadius, zeroToForceLineProjection.getDirection());
-        Point targetPoint = forceCircleProjection.add(zeroOffset).toPoint();
-
-        for (Limit limit : limits) {
-            candidatePoints.add(limit.closestPoint(targetPoint));
-        }
-
-        boolean withinLimits = false;
-        Point candidatePoint = new Point();
-
-        while (!withinLimits) {
-            withinLimits = true;
-            candidatePoint = targetPoint.closestPoint(candidatePoints);
-            for (Limit limit : limits) {
-                withinLimits &= limit.withinLimit(candidatePoint);
-            }
-            candidatePoints.remove(candidatePoint);
-        }
-        Vector moveVector = new Vector(candidatePoint);
-
-        if (moveVector.getDirection() < -90 || moveVector.getDirection() > 90){
-            nextSpeed = -moveVector.getMagnitude();
-            nextTurn = Tools.shortestAngle(-moveVector.getDirection()-180);
-        }else {
-            nextSpeed = moveVector.getMagnitude();
-            nextTurn = -moveVector.getDirection();
-        }
-        nextPosition = position.addVector(new Vector(
-                moveVector.getMagnitude(),
-                moveVector.getDirection() + velocity.getDirection()
+    public Point getNextPosition() {
+        return position.addVector(new Vector(
+                moveCommand.getMagnitude(),
+                moveCommand.getDirection() + velocity.getDirection()
         ));
     }
 
-    public Point getNextPosition() {
-        return nextPosition;
+    public Vector getNextVelocity() {
+        return new Vector(
+                moveCommand.getMagnitude(),
+                moveCommand.getDirection() + velocity.getDirection()
+        );
     }
 
     public double getNextSpeed() {
-        return nextSpeed;
+        if (moveCommand.getDirection() < -90 || moveCommand.getDirection() > 90){
+            return -moveCommand.getMagnitude();
+        }else {
+            return moveCommand.getMagnitude();
+        }
     }
 
     public double getNextTurn() {
-        return nextTurn;
+        if (moveCommand.getDirection() < -90 || moveCommand.getDirection() > 90){
+            return Tools.reduceAngle(180-moveCommand.getDirection());
+        }else {
+            return -moveCommand.getDirection();
+        }
     }
 }

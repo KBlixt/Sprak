@@ -29,7 +29,7 @@ public class Vector {
 
     public Vector set(double magnitude, double direction) {
         this.magnitude = magnitude;
-        this.direction = Tools.shortestAngle(direction);
+        this.direction = Tools.reduceAngle(direction);
         return this;
     }
 
@@ -39,7 +39,7 @@ public class Vector {
 
         magnitude = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
         if (magnitude != 0) {
-            direction = Tools.shortestAngle(Math.toDegrees(Math.atan2(y,x)));
+            direction = Tools.reduceAngle(Math.toDegrees(Math.atan2(y,x)));
         }else{
             direction = 0;
         }
@@ -58,7 +58,7 @@ public class Vector {
     }
 
     public Vector setDirection(double direction){
-        this.direction = Tools.shortestAngle(direction);
+        this.direction = Tools.reduceAngle(direction);
         return this;
     }
 
@@ -112,7 +112,7 @@ public class Vector {
     }
 
     public Vector negative(){
-        return new Vector(magnitude, Tools.shortestAngle(direction-180));
+        return new Vector(magnitude, Tools.reduceAngle(direction-180));
     }
 
     public Vector multiply(double factor){
@@ -150,7 +150,7 @@ public class Vector {
 
     public double angleToVector(Vector vector){
         double angle = vector.getDirection() - direction;
-        return Tools.shortestAngle(angle);
+        return Tools.reduceAngle(angle);
     }
 
     public String toString(){
@@ -159,6 +159,14 @@ public class Vector {
 
 
     public static Vector addAll(List<Vector> vectors){
+        Vector sumVector = new Vector();
+        for (Vector vector : vectors) {
+            sumVector = sumVector.add(vector);
+        }
+        return sumVector;
+    }
+
+    public static Vector addAll(Vector[] vectors){
         Vector sumVector = new Vector();
         for (Vector vector : vectors) {
             sumVector = sumVector.add(vector);
